@@ -16,6 +16,10 @@ Como dono do app, quero entrar com Google e criar minha equipe, sem que desconhe
 - [ ] Toda rota de negócio passa por um guard que resolve a equipe do usuário.
 - [ ] Testes usam tokens assinados localmente, sem depender do Google.
 - [ ] `docs/operacao/google-oauth.md` guia a criação das credenciais.
+- [ ] O login usa PKCE e só retorna para URLs cadastradas.
+- [ ] Excesso de requisições do mesmo IP recebe 429 com mensagem em português.
+- [ ] Os papéis `anon` e `authenticated` não têm acesso às tabelas.
+- [ ] Sair limpa os dados em cache no navegador.
 
 ## Notas técnicas
 - Tabelas: Team, User, Membership, Invite (spec §6). Comparar e-mails normalizados (sem espaços, minúsculos).
@@ -49,6 +53,7 @@ meSchema = discriminatedUnion('state', [
 - `Membership(id, teamId, userId unique, role, createdAt)`.
 - `Invite(id, teamId, email, role, status 'pending'|'accepted'|'canceled', invitedById, createdAt)` com índice único parcial `(team_id, email) WHERE status='pending'`.
 - `Project(id, teamId, name, slug, ticketRegex default '[A-Z]+-\d+', defaultDuration 'H4'|'D1'|'D3'|'UNTIL_RELEASED' default 'D1', validateConsistency default true, archivedAt?, createdAt)` único `(teamId, slug)`.
+- [ ] A migração revoga de `anon` e `authenticated` o acesso a tabelas, sequências e funções do schema `public`, também nos privilégios padrão (`ALTER DEFAULT PRIVILEGES`); teste confere que não há concessão.
 - [ ] `rls.int-spec`: nenhuma tabela do schema `public` com `relrowsecurity = false`; leitura REST no banco de desenvolvimento com a chave pública não retorna linhas.
 - [ ] Commit `feat(api): modelos de equipe e acesso`.
 
@@ -57,7 +62,8 @@ meSchema = discriminatedUnion('state', [
 **Produz:** `TokenVerifier.verify(token): Promise<{ supabaseId; name; avatarUrl|null }>` com `jose` e JWKS em `${SUPABASE_URL}/auth/v1/.well-known/jwks.json`, emissor `${SUPABASE_URL}/auth/v1`, audiência `authenticated`; `IdentityVerifier.verifiedEmail(supabaseId): Promise<string|null>`; `AuthGuard` global, com `@Public()` no `/health`; `@CurrentAuth()`.
 - [ ] `token-verifier.spec` (chaves geradas no teste): recusa ausente, expirado, outro emissor, outra audiência, assinatura errada, `alg: none` e provider diferente de `google`.
 - [ ] `identity-verifier.spec`: devolve e-mail só da identidade `google` com `email_verified: true`.
-- [ ] Modo de teste: `AUTH_TEST_MODE=true` aceita provider `email` (para e2e); `loadEnv` **falha** se vier junto de `NODE_ENV=production`.
+- [ ] Modo de teste: `AUTH_TEST_MODE=true` aceita provider `email` (para e2e); `loadEnv` **falha** se `NODE_ENV` for diferente de `test`, inclusive ausente. O `playwright.config` define `NODE_ENV=test`.
+- [ ] Limite de requisições com `@nestjs/throttler`: guard global antes do `AuthGuard`, por IP, `RATE_LIMIT_PER_MINUTE` (padrão 300, porque o escritório pode sair por um IP só), `/health` fora; teste: excesso → 429 `RATE_LIMITED`, mesmo com token inválido.
 - [ ] Commit `feat(api): autenticação por token do supabase`.
 
 ### Tarefa 3 — `/me`, equipe e guard de equipe [back]
@@ -73,6 +79,9 @@ meSchema = discriminatedUnion('state', [
 ### Tarefa 4 — Login no web [front]
 **Arquivos:** `src/lib/{supabase.ts,auth.tsx}`, `src/app/{router.tsx,RequireMember.tsx}`, `src/pages/{LoginPage,CreateTeamPage,NoAccessPage}.tsx`; variáveis `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`
 **Produz:** `useSession()`, `useMe()`, `signInWithGoogle()`, `signOut()`; `apiFetch` envia o token e, em 401, encerra a sessão e vai para `/login` guardando a rota de destino (só caminhos internos).
+- [ ] Cliente do Supabase com `flowType: 'pkce'`; URLs de retorno listadas em `supabase/config.toml`.
+- [ ] `signOut()` chama `queryClient.clear()`.
+- [ ] Criar equipe usa React Hook Form; criar `lib/forms.ts` com `applyApiErrors`.
 - [ ] Testes: o botão único chama o provedor `google`; `needs_team` → `/onboarding/equipe`; `not_invited` → tela sem permissão com "Sair"; `member` → `/p/:defaultProjectSlug`; retorno externo (`//site`) é ignorado.
 - [ ] Criar equipe: slug sugerido a partir do nome até a pessoa editar; conflito aparece no campo.
 - [ ] Commit `feat(web): login com google e criação da equipe`.

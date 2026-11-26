@@ -36,7 +36,7 @@ unblockSchema = { expectedBlockId: uuid }
 - [ ] Commit `feat(api): bloquear e desbloquear`.
 
 ### Tarefa 2 — Interface [designer, depois front]
-**Arquivos:** `App-Bloquear` adaptada (sem avisar pessoas); `src/features/actions/BlockModal.tsx`; botões do drawer conforme a tabela da spec §7
+**Arquivos:** `App-Bloquear` adaptada (sem avisar pessoas); `src/features/actions/BlockModal.tsx`; botões do drawer conforme a tabela da spec §7; parâmetro `?acao=bloquear` (estende o `acaoParser`); formulário com React Hook Form
 - [ ] Testes: ações por status exatamente como a tabela (um teste parametrizado nos quatro); descrição obrigatória com erro no campo; o card mostra `! <descrição>`; desbloquear em um clique, sem enviar duas vezes.
 - [ ] e2e: reservar → bloquear → desbloquear → continua reservado.
 - [ ] Commit `feat(web): bloqueio de ambiente`.

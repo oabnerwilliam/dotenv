@@ -41,13 +41,14 @@ updateProjectSchema = { name: 1..60 }          // o slug não muda, para não qu
 
 ### Tarefa 3 — Casca da aplicação [front]
 **Arquivos:** `src/app/layout/{AppShell,TopNav,SideNav,ProjectSelect,TeamMenu,Logo}.tsx`, `src/lib/useSidebar.ts`, rotas em `src/app/router.tsx`
-**Produz:** `useSidebar(): { collapsed: boolean; toggle(): void }` (chave `env.sidebar`, leitura e escrita em `try/catch`); `useProject(): Project` para as páginas filhas.
+**Produz:** `useSidebar(): { collapsed: boolean; toggle(): void }`, sobre um store Zustand com `persist` (chave `env.sidebar`, armazenamento próprio com leitura e escrita em `try/catch`); `useProject(): Project` para as páginas filhas.
 - [ ] Testes: alternar persiste; recolhido mantém nomes acessíveis; `aria-current="page"`; menu da equipe fecha com Esc e devolve o foco; ordem de Tab conforme `SCREENS.md`; slug desconhecido mostra "não encontrado" com volta.
 - [ ] Páginas de board, histórico e configurações como marcadores vazios.
 - [ ] Commit `feat(web): navegação principal`.
 
 ### Tarefa 4 — Gestão de projetos [front]
 **Arquivos:** `src/features/projects/*`
+- [ ] Criar e renomear com React Hook Form e os schemas de `shared`.
 - [ ] Testes: criar navega para o novo; slug sugerido; arquivar pede confirmação e vai para outro projeto ou para "nenhum projeto".
 - [ ] e2e `projects.spec.ts`: criar, renomear, arquivar; em 375px a página não rola na horizontal.
 - [ ] Commit `feat(web): criar, renomear e arquivar projetos`.

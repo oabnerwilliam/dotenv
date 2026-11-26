@@ -1,6 +1,6 @@
 # .env — Design da Fase 1 (CRUD)
 
-Data: 2026-11-25 · Status: aprovado em 2026-11-25
+Data: 2026-11-25 · Status: aprovado em 2026-11-25 · Revisado em 2026-11-26 (estado no front e segurança)
 
 Itens marcados com **(proposta)** partiram de quem escreveu o documento e foram aprovados junto com ele.
 
@@ -62,7 +62,7 @@ React ──REST + JWT──> NestJS ──Prisma──> Postgres (Supabase)
 
 ### Estrutura **(proposta)**
 ```
-apps/web          React, Vite, Tailwind v4, react-router, TanStack Query, Radix UI, lucide-react
+apps/web          React, Vite, Tailwind v4, react-router, TanStack Query, React Hook Form, Zustand, nuqs, Radix UI, lucide-react
 apps/api          NestJS, Prisma
 packages/shared   tipos, enums, schemas de validação (Zod) e a regra de consistência de branches
 docs/design       pacote de design (referência visual)
@@ -72,6 +72,17 @@ supabase/         configuração do Supabase local
 - Desenvolvimento e testes usam o Supabase local (CLI + Docker). O projeto na nuvem é criado na publicação.
 - Testes: Jest na API, Vitest no web e em `shared`, Playwright ponta a ponta.
 - Portões: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:e2e`, `pnpm build`.
+
+### Estado no front
+| Tipo de estado | Ferramenta | Exemplos |
+|---|---|---|
+| Dados do servidor | TanStack Query (React Query) | board, `/me`, membros, histórico; ações com `useMutation` |
+| Formulários | React Hook Form com os schemas Zod de `shared` | criar equipe, convite, projeto, editar, reservar, bloquear |
+| Estado global do navegador | Zustand | menu lateral recolhido |
+| Estado na URL (depois do `?`) | nuqs | filtros do histórico, ação aberta, coluna destacada |
+
+- Dado do servidor não é copiado para o Zustand.
+- O que identifica um recurso fica no caminho da rota (`/p/:projeto/ambientes/:ambiente`).
 
 ### Autenticação e acesso
 1. O front faz login com Google pelo Supabase e envia o token em cada requisição.
@@ -83,6 +94,30 @@ supabase/         configuração do Supabase local
 7. Toda consulta é filtrada pela equipe do usuário, com teste automatizado de isolamento entre equipes.
 
 O login Google exige credenciais OAuth criadas no Google Cloud. Esse passo é do autor, com roteiro.
+
+A API não guarda senha nem sessão. O token diz apenas quem é a pessoa; equipe e papel são consultados no banco a cada requisição. O Prisma conecta com um usuário que ignora o RLS, então dentro da API a barreira entre equipes é o filtro por equipe.
+
+### Onde fica o token
+| Abordagem | A favor | Contra |
+|---|---|---|
+| **Padrão do Supabase no `localStorage`, com CSP** (escolhida pelo autor em 2026-11-26) | Simples; sem cookie, não há CSRF | Um XSS consegue ler o token |
+| API intermedeia o login com cookie `httpOnly` | O JavaScript não lê o token | A API passa a manter sessão, tratar CSRF e cookies entre domínios |
+
+### Segurança
+| Risco | Medida | História |
+|---|---|---|
+| Modo de teste ligado no ar | `AUTH_TEST_MODE` só vale com `NODE_ENV=test` | 03 |
+| Interceptação do login | Fluxo PKCE e lista fechada de URLs de retorno | 03 |
+| XSS | CSP e cabeçalhos no front; `dangerouslySetInnerHTML` proibido no lint | 01, 12 |
+| Abuso e força bruta | Limite de requisições por IP, com o proxy da hospedagem configurado | 03, 12 |
+| Cabeçalhos HTTP | `helmet` na API | 01 |
+| Entrada gigante | Limite de tamanho em textos e listas dos schemas | 06, 08 |
+| Token ou e-mail em log | Logs sem `Authorization`, tokens, e-mails ou corpo de requisição | 01 |
+| Segredo no repositório público | Secret scanning com push protection e `gitleaks` no CI | 01 |
+| Dependência maliciosa ou vulnerável | Dependabot, `pnpm audit` e `minimumReleaseAge` | 01 |
+| CI com permissão demais | `contents: read` e actions fixadas por SHA | 01 |
+| Segunda porta para o banco | Acessos de `anon` e `authenticated` revogados, além do RLS; Data API desligada na nuvem | 03, 12 |
+| Cache de outra pessoa no mesmo navegador | Sair limpa o cache do React Query | 03 |
 
 ### Papéis **(proposta)**
 | Ação | Admin | Membro |

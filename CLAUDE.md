@@ -68,6 +68,7 @@ Passam a existir na história 01.
 - Monorepo pnpm: `apps/web` (React, Vite, Tailwind v4), `apps/api` (NestJS, Prisma), `packages/shared`.
 - O front nunca acessa tabelas do Supabase; usa o Supabase só para login. RLS ligado sem políticas públicas.
 - Toda consulta filtrada pela equipe do usuário.
+- No front: dados do servidor no React Query, formulários no React Hook Form, estado global no Zustand, estado de URL no nuqs.
 - Antes de mexer em UI: `docs/design/docs/DESIGN.md`, `COMPONENTS.md`, `SCREENS.md`, `tokens.css` e o HTML da tela em `docs/design/screens/`. **A spec vence o design quando divergirem.**
 - Texto de interface em Inter; dados (ambientes, tickets, branches, serviços, PRs) em fonte mono.
 - Nome de ambiente sempre por `<EnvName>`. Status sempre por `data-status`.

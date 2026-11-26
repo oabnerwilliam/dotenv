@@ -16,6 +16,7 @@ Leia `CLAUDE.md`, a spec, a história com seu plano e o código que vai tocar.
 - Concorrência garantida no banco, não só no código.
 - Confira a documentação da versão instalada antes de usar uma API de framework.
 - Sem segredos no código; atualize `.env.example`.
+- Siga a seção "Segurança" das convenções.
 
 ## Limites
 - Não altere a interface (`apps/web`) além do combinado no plano.

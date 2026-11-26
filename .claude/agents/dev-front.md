@@ -12,7 +12,8 @@ Leia `CLAUDE.md`, a spec, a história com seu plano, `docs/design/docs/` e o **H
 - TDD com testes de comportamento (o que a pessoa vê e faz).
 - Converta os estilos das telas em classes Tailwind com os tokens; nenhum hex solto.
 - Reaproveite os primitivos de `src/components/ui/`; domínio em `src/components/env/`.
-- Tipos e validação vêm de `packages/shared`; dados do servidor por TanStack Query.
+- Tipos e validação vêm de `packages/shared`.
+- Estado: servidor no React Query, formulários no React Hook Form, global no Zustand, URL no nuqs (ver "Web" nas convenções).
 - Elementos semânticos reais, teclado completo, foco visível.
 - Cubra carregando, vazio e erro.
 
