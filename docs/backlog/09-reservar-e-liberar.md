@@ -54,7 +54,7 @@ canRelease(env: EnvironmentView, member: { userId: string; role: Role }): boolea
 - [ ] Commit `feat(api): reservar e liberar ambientes`.
 
 ### Tarefa 4 — Modais [designer, depois front]
-**Arquivos:** telas `App-Reservar` e `App-Liberar` adaptadas; `src/features/actions/{ReserveModal,ReleaseModal}.tsx`, `useEnvironmentAction.ts`; parâmetro `?acao=reservar|liberar`
+**Arquivos:** telas `App-Reservar` e `App-Liberar` adaptadas; `src/features/actions/{ReserveModal,ReleaseModal}.tsx`, `useEnvironmentAction.ts`; parâmetro `?acao=reservar|liberar` (estende o `acaoParser`); formulários com React Hook Form
 **Produz:** `useEnvironmentAction(mutation)`: no sucesso invalida board e histórico e fecha; em `STATE_CHANGED` invalida, fecha e anuncia "O ambiente mudou enquanto você decidia" numa região `role="status"`.
 - [ ] Testes: o prazo padrão vem das regras; "no seu nome até …" calculado; Liberar escondido quando `canRelease` é falso; clique duplo envia uma vez; o drawer mostra quem reservou e o prazo.
 - [ ] e2e: reservar pelo card e liberar pelo drawer; outro membro não vê Liberar.

@@ -45,6 +45,7 @@ membersSchema = { members: {id,userId,name,email,avatarUrl|null,role}[]; invites
 
 ### Tarefa 3 — Tela [front]
 **Arquivos:** `src/features/members/{MembersPage,InviteForm,MemberList}.tsx`, rota `/equipe/membros`
+- [ ] `InviteForm` com React Hook Form e `inviteSchema`; erros da API por `applyApiErrors`.
 - [ ] Testes: admin convida e vê o pendente; erro no campo; confirmação antes de remover; membro comum não vê ações; 409 do último admin aparece em `Banner`.
 - [ ] Sem a navegação da história 05, a página funciona sozinha e a 05 adiciona o link.
 - [ ] Commit `feat(web): tela de membros`.

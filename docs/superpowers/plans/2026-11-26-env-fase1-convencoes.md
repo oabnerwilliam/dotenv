@@ -20,6 +20,9 @@ Fixar por motivo de compatibilidade com Node 22.14 e entre si; não subir de ver
 | react-router | 7.18 (a 8 exige Node ≥ 22.22) |
 | tailwindcss, @tailwindcss/vite | 4.3 |
 | @tanstack/react-query | 5 |
+| react-hook-form, @hookform/resolvers | 7, 7 |
+| zustand, nuqs | 5, 2 |
+| @nestjs/throttler, helmet | 6, 8 |
 | radix-ui, lucide-react | 1, 1 |
 | vitest, jsdom | 4.1, 26.1 |
 | @testing-library/react, user-event, msw | 16, 14, 2 |
@@ -55,8 +58,8 @@ Pacotes: `@env/web`, `@env/api`, `@env/shared`.
 ```ts
 type ErrorCode =
   | 'VALIDATION' | 'UNAUTHENTICATED' | 'NOT_INVITED' | 'FORBIDDEN' | 'NOT_FOUND'
-  | 'CONFLICT' | 'VERSION_CONFLICT' | 'STATE_CHANGED' | 'INTERNAL';
-// 400, 401, 403, 403, 404, 409, 409, 409, 500
+  | 'CONFLICT' | 'VERSION_CONFLICT' | 'STATE_CHANGED' | 'RATE_LIMITED' | 'INTERNAL';
+// 400, 401, 403, 403, 404, 409, 409, 409, 429, 500
 class AppError extends Error { constructor(code: ErrorCode, message: string, fields?: Record<string,string>) }
 ```
 - Recurso de outra equipe responde `NOT_FOUND`, nunca `FORBIDDEN`.
@@ -72,6 +75,19 @@ class AppError extends Error { constructor(code: ErrorCode, message: string, fie
 - `apiFetch<T>(path: string, schema: ZodType<T>, init?: RequestInit): Promise<T>` em `lib/api.ts` anexa o token e lança `ApiError { status, code, message, fields? }`.
 - Chaves do React Query em `lib/queryKeys.ts`.
 - Testes de tela usam msw; consultas por papel e nome acessível.
+- Cada biblioteca é instalada na primeira história que a usa.
+
+### Estado
+- **Servidor:** só React Query (`useQuery`, `useMutation`). Não copiar a resposta para `useState` ou Zustand.
+- **Formulários:** React Hook Form com `zodResolver(schema)` de `@env/shared`. `register` em inputs; `Controller` em `Select`, `Switch` e `ChipRadioGroup`. Os `fields` do `ApiError` vão para o campo com `applyApiErrors(error, setError)` em `lib/forms.ts`.
+- **Global do navegador:** Zustand, um store pequeno por assunto, com seletores. Token e sessão ficam com o `supabase-js`.
+- **URL:** nuqs, com os parsers em `lib/urlState.ts`; valor desconhecido cai no padrão. Testes com `NuqsTestingAdapter`.
+
+## Segurança
+- Schemas de entrada têm tamanho máximo em todo texto e lista.
+- Logs nunca incluem `Authorization`, tokens, e-mails ou corpo de requisição.
+- `dangerouslySetInnerHTML` é proibido (regra de lint).
+- Variáveis `VITE_*` vão para o navegador: nunca colocar segredo nelas.
 
 ## Rotas da API (visão geral)
 | História | Rotas |

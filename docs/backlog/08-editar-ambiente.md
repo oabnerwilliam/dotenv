@@ -27,7 +27,7 @@ editEnvironmentSchema = {
   version: int, usage: 'free'|'in_use',
   ticket: { key: ≤40|null, title: ≤200|null, jiraStatus: ≤40|null },
   devName: ≤80|null, qaName: ≤80|null,
-  services: { serviceId, branch: ≤200|null, deployedAt: datetime|null }[] }
+  services: { serviceId, branch: ≤200|null, deployedAt: datetime|null }[] ≤50 }
 // resposta: EnvironmentView
 // eventData 'edited' = { changes: Change[] }
 type Change = { field: 'usage'|'ticketKey'|'ticketTitle'|'ticketJiraStatus'|'dev'|'qa'|'branch'|'deployedAt',
@@ -46,7 +46,8 @@ diffEnvironment(before: EnvironmentView, input: EditEnvironment): Change[]   // 
 - [ ] Commit `feat(api): edição manual de ambiente`.
 
 ### Tarefa 3 — Formulário [designer, depois front]
-**Arquivos:** `docs/design/screens/App-Drawer-Editar.html`; `src/features/environment/EditForm.tsx`; parâmetro `?acao=editar`
+**Arquivos:** `docs/design/screens/App-Drawer-Editar.html`; `src/features/environment/EditForm.tsx`; parâmetro `?acao=editar` (nuqs, `acaoParser` em `lib/urlState.ts`)
+- [ ] React Hook Form, com `useFieldArray` nos serviços. Os valores iniciais e a `version` vêm de `defaultValues` na abertura; não usar a opção `values`, que sobrescreveria o digitado a cada nova busca.
 - [ ] Testes: preenchido com os dados atuais; sugestões de membros via `datalist`, aceitando texto livre; data em horário local convertida para UTC; Cancelar descarta; 409 mostra "Outra pessoa alterou este ambiente" com "Recarregar", preservando o digitado até a pessoa decidir.
 - [ ] A atualização automática não sobrescreve o formulário aberto (teste com nova busca durante a digitação).
 - [ ] e2e: editar branches e ver `⚠ 3/4` no card.

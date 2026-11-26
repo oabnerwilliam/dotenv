@@ -29,7 +29,7 @@ Regras do Jira, liberação automática, importação do GitHub.
 ```ts
 serviceSchema = { id, name: 1..40, repository: ≤140|null, baseBranch: 1..120, order: int }
 serviceInputSchema = { name, repository, baseBranch }
-serviceOrderSchema = { ids: uuid[] }                    // exatamente os serviços do projeto
+serviceOrderSchema = { ids: uuid[] ≤50 }                // exatamente os serviços do projeto
 envTypeSchema = 'internal'|'external'|'base'            // rótulos Interno, Externo, Base
 environmentInputSchema = { name: 1..40, type, githubEnvironment: ≤80|null }
 rulesSchema = { ticketRegex, defaultDuration: Duration, validateConsistency: boolean }
@@ -61,11 +61,13 @@ eventDataSchema = discriminatedUnion('type', …)          // esta história def
 ### Tarefa 3 — API de configurações [back]
 **Rotas (sob `/projects/:project`):** `GET/POST services`, `PATCH/DELETE services/:id`, `PUT services/order`; `GET/POST environments`, `PATCH environments/:env`, `POST environments/:env/archive`; `GET/PUT rules`.
 - [ ] int-spec: nome repetido sem diferenciar maiúsculas → 409 `fields.name`; nome arquivado pode ser reutilizado; slug ganha `-2` se colidir; renomear não muda o slug; criar e arquivar geram evento; remover serviço apaga as branches; regex inválida → 400 `fields.ticketRegex`; ids alheios → 404.
+- [ ] Um projeto aceita até 50 serviços: o 51º → 400.
 - [ ] Ponto de extensão `EnvironmentsService.assertCanArchive(environmentId)`, vazio aqui; as histórias 09 e 10 o implementam com teste.
 - [ ] Commit `feat(api): configurações do projeto`.
 
 ### Tarefa 4 — Tela [designer, depois front]
 **Arquivos:** `src/features/settings/{SettingsPage,EnvironmentsPanel,ServicesPanel,RulesPanel}.tsx`
+- [ ] Modais e painel Regras com React Hook Form; Salvar e Descartar usam `isDirty` e `reset`.
 - [ ] Testes: tabela e modais de criar e editar; ordenar por botões "subir" e "descer"; remover serviço e arquivar ambiente pedem confirmação; Salvar e Descartar valem para o painel Regras e ficam desativados sem mudança.
 - [ ] e2e `settings.spec.ts`: criar 4 serviços e 2 ambientes, salvar uma regra, recarregar.
 - [ ] Commit `feat(web): tela de configurações`.

@@ -55,6 +55,7 @@ boardSchema = { environments: environmentViewSchema[]; generatedAt }
 ### Tarefa 3 — Board [designer, depois front]
 **Arquivos:** `src/features/board/{BoardPage,StatusLine,EnvColumn,EnvCard,ConsistencyLabel}.tsx`, `useBoard.ts`, `src/lib/tempo.ts` (`tempoRelativo(data: Date, agora: Date): string` em pt-BR)
 **Produz:** `useBoard(slug)` com `refetchInterval: 30_000` e `refetchOnWindowFocus: true`, mantendo os dados anteriores em erro. `EnvCard({ env, actions?: ReactNode })`.
+- [ ] A coluna destacada fica na URL (`?destaque=livre|reservado|uso|bloqueado`) com nuqs; esta história adiciona o `NuqsAdapter` (`nuqs/adapters/react-router/v7`) e `lib/urlState.ts`.
 - [ ] Testes: colunas e contagens; o token alterna `aria-pressed` e esmaece as outras colunas; variações do card; botão dentro do card não abre o drawer; vazio leva a Configurações; carregando com `role="status"`; erro com dados mostra a faixa e mantém os cards; "+ Novo" leva à criação de ambiente.
 - [ ] Commit `feat(web): board de ambientes`.
 

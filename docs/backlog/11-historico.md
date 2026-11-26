@@ -41,7 +41,7 @@ eventPageSchema = { items: eventViewSchema[]; nextCursor: string|null }
 - [ ] Commit `feat(web): formatação do histórico`.
 
 ### Tarefa 3 — Tela [designer, depois front]
-**Arquivos:** `src/features/history/{HistoryPage,HistoryFilters,HistoryRow}.tsx`; parâmetros `?ambiente=&tipo=&periodo=` (padrão `7d`)
+**Arquivos:** `src/features/history/{HistoryPage,HistoryFilters,HistoryRow}.tsx`; parâmetros `?ambiente=&tipo=&periodo=` (padrão `7d`), com `useQueryStates` do nuqs; os filtros entram na chave do React Query e "Carregar mais" usa `useInfiniteQuery`
 - [ ] Testes: filtros leem e escrevem a URL (valor desconhecido cai no padrão); "Carregar mais"; o mesmo dia dividido entre páginas vira um grupo; vazio, sem resultado, carregando e erro; em largura estreita rola só a tabela.
 - [ ] e2e: ações geram linhas na ordem certa.
 - [ ] Commit `feat(web): tela de histórico`.
