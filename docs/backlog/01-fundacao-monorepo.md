@@ -100,8 +100,8 @@ Autenticação, telas do produto, publicação.
 
 **Scripts na raiz:** `db:start` (`supabase start`), `db:stop` (`supabase stop`), `db:migrate` (`pnpm --filter @env/api exec prisma migrate dev && pnpm --filter @env/api run generate`; o Prisma 7 não gera o client sozinho), `db:test:setup` (`node scripts/db-test-setup.mjs`). `codegen` passa a incluir `&& pnpm --filter @env/api run generate`. `supabase` é devDependency da raiz (a 2.x baixa o binário por `optionalDependencies`, sem script de instalação).
 
-- [ ] Com `apps/api/.env` copiado do exemplo: `pnpm db:start && pnpm db:migrate && pnpm db:test:setup` termina sem erro, também na segunda execução.
-- [ ] `pnpm --filter @env/api run generate` funciona sem `.env` e sem `DATABASE_URL`.
+- [x] Com `apps/api/.env` copiado do exemplo: `pnpm db:start && pnpm db:migrate && pnpm db:test:setup` termina sem erro, também na segunda execução.
+- [x] `pnpm --filter @env/api run generate` funciona sem `.env` e sem `DATABASE_URL`.
 - [ ] Commit `chore: supabase local e prisma`.
 
 ### Tarefa 3 — API com `/health` [back]
