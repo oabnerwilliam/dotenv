@@ -51,6 +51,7 @@ Autenticação, telas do produto, publicação.
     msw: false                   # o script só serve ao worker de navegador, que não usamos
   overrides:
     vite: ~7.3.0                 # sem isto o Vitest pode puxar o Vite 8
+    '@prisma/config>effect': 3.22.1  # GHSA-7589-6fvf-x4pw; ver Tarefa 5
   ```
 - `tsconfig.base.json`: `strict`, `noUncheckedIndexedAccess`, `target ES2022`, `esModuleInterop`, `skipLibCheck`. `module` e `moduleResolution` ficam em cada pacote.
 - `eslint.config.mjs`: flat config; `tseslint.configs.recommended` (sem regras com tipos, para o lint não depender de build); para `apps/web`, `reactHooks.configs.flat.recommended` e `jsxA11y.flatConfigs.recommended`; ignora `**/dist/**`, `**/coverage/**`, `apps/api/src/generated/**`, `playwright-report/**`, `test-results/**`, `docs/**`.
@@ -205,7 +206,8 @@ Passos, em ordem:
 - [x] e2e `a tela inicial mostra a API e o banco conectados`.
 - [x] CI conforme acima. Acrescentados `timeout-minutes: 20` e `COREPACK_ENABLE_DOWNLOAD_PROMPT=0` (o corepack não pode esperar confirmação).
 - [ ] Rodar localmente o comando de auditoria e anotar o resultado no PR. Vulnerabilidade alta sem correção dentro das faixas: parar e perguntar.
-  - Local em 2026-11-26: o comando do CI não acusa nada. Sem `--prod` há uma alta (`effect` 3.20.0, GHSA-7589-6fvf-x4pw, corrigida na 3.22.1), fixada em versão exata pelo `@prisma/config` 7.10.1, sem Prisma 7 mais novo. Ela vem pela CLI do Prisma, que o `pnpm why --prod` mostra como par opcional do `@prisma/client`. O trecho vulnerável (`Schema.TemplateLiteral`) não aparece no `@prisma/config`. Decisão pendente.
+  - Local em 2026-11-26: o comando do CI não acusa nada. Sem `--prod` havia uma alta (`effect` 3.20.0, GHSA-7589-6fvf-x4pw, corrigida na 3.22.1), fixada em versão exata pelo `@prisma/config` 7.10.1, sem Prisma 7 mais novo. Ela vem pela CLI do Prisma, que o `pnpm why --prod` mostra como par opcional do `@prisma/client`.
+  - Decisão do usuário: forçar a 3.22.1 com o override `'@prisma/config>effect'` em `pnpm-workspace.yaml`, a remover quando um Prisma 7 exigir a versão corrigida. Com ele, `generate`, `validate`, migrações (inclusive num banco `_test` novo) e os cinco portões em estado limpo passaram. A auditoria não acusa nada com `--prod`; sem `--prod` restam duas moderadas (`glob` e `minimatch`, via `@nestjs/cli`) e uma baixa (`esbuild`, via `tsup`).
 - [x] `dependabot.yml` (o `ignore` de versão principal vale nos dois ecossistemas e não bloqueia correções de segurança).
 - [x] Orquestrador: conferir se secret scanning e push protection estão ligados no repositório (ligados, junto com os alertas e correções de segurança do Dependabot).
 - [x] README.

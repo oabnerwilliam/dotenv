@@ -7,3 +7,6 @@ allowBuilds: # pnpm 10 não roda scripts de dependências sem permissão
   msw: false # o script só serve ao worker de navegador, que não usamos
 overrides:
   vite: ~7.3.0 # sem isto o Vitest pode puxar o Vite 8
+  # GHSA-7589-6fvf-x4pw (alta): o `@prisma/config` 7.10.1 fixa o `effect` 3.20.0 e a correção
+  # saiu na 3.22.1. Remover quando um Prisma 7 exigir `effect` 3.22.1 ou mais novo.
+  '@prisma/config>effect': 3.22.1
