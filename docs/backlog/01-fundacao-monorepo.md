@@ -85,6 +85,7 @@ Autenticação, telas do produto, publicação.
     provider     = "prisma-client"
     output       = "../src/generated/prisma"
     moduleFormat = "cjs"
+    importFileExtension = "js" // ajustado na Tarefa 3: o padrão sem tsconfig era `.ts`, que não roda compilado
   }
   datasource db {
     provider = "postgresql"
@@ -128,16 +129,16 @@ Autenticação, telas do produto, publicação.
 - `ErrorFilter`: `AppError` → status do código; erro HTTP do próprio Nest ou do parser de corpo → 404 vira `NOT_FOUND`, demais 4xx viram `VALIDATION` mantendo o status, com mensagem em português; resto → 500 `INTERNAL`.
 - Log de erro desconhecido: método, caminho sem query string, nome do erro e as linhas de pilha **sem** a mensagem (mensagens do Prisma podem trazer valores). Nunca cabeçalhos ou corpo.
 
-- [ ] `env.spec` `loadEnv cita as variáveis ausentes`: `loadEnv({})` lança erro cuja mensagem contém `DATABASE_URL` e `WEB_ORIGIN`; e `usa a porta 3333 por padrão`.
-- [ ] `error.filter.spec`: `AppError('NOT_FOUND', …)` vira 404 com `{code,message}`; erro desconhecido vira 500 `INTERNAL` sem vazar a mensagem original.
-- [ ] `error.filter.spec`: o erro desconhecido é registrado sem cabeçalhos, corpo, query string nem a mensagem original.
-- [ ] `zod.pipe.spec`: entrada inválida vira `AppError` `VALIDATION` com `fields` por caminho.
-- [ ] `health.int-spec`: `GET /health` → 200 `{status:'ok',database:'up'}` contra o `env_test`; com o `PrismaService` substituído por um que falha → 200 `database:'down'`.
-- [ ] `health.int-spec`: `Access-Control-Allow-Origin` é sempre `WEB_ORIGIN`, mesmo com outro `Origin`.
-- [ ] `health.int-spec`: `/health` traz `content-security-policy`, `strict-transport-security` e `x-content-type-options: nosniff`, e não traz `x-powered-by`.
-- [ ] `errors.int-spec`: rota inexistente → 404 `NOT_FOUND`; JSON malformado → 400 `VALIDATION`.
-- [ ] `db.int-spec`: `_prisma_migrations` está com RLS ligado (`pg_class.relrowsecurity`).
-- [ ] `pnpm --filter @env/api build` e, com o `.env`, `pnpm --filter @env/api start` respondem `/health` com `database: 'up'` (confirma o client Prisma em CommonJS fora do Jest).
+- [x] `env.spec` `loadEnv cita as variáveis ausentes`: `loadEnv({})` lança erro cuja mensagem contém `DATABASE_URL` e `WEB_ORIGIN`; e `usa a porta 3333 por padrão`.
+- [x] `error.filter.spec`: `AppError('NOT_FOUND', …)` vira 404 com `{code,message}`; erro desconhecido vira 500 `INTERNAL` sem vazar a mensagem original.
+- [x] `error.filter.spec`: o erro desconhecido é registrado sem cabeçalhos, corpo, query string nem a mensagem original.
+- [x] `zod.pipe.spec`: entrada inválida vira `AppError` `VALIDATION` com `fields` por caminho.
+- [x] `health.int-spec`: `GET /health` → 200 `{status:'ok',database:'up'}` contra o `env_test`; com o `PrismaService` substituído por um que falha → 200 `database:'down'`.
+- [x] `health.int-spec`: `Access-Control-Allow-Origin` é sempre `WEB_ORIGIN`, mesmo com outro `Origin`.
+- [x] `health.int-spec`: `/health` traz `content-security-policy`, `strict-transport-security` e `x-content-type-options: nosniff`, e não traz `x-powered-by`.
+- [x] `errors.int-spec`: rota inexistente → 404 `NOT_FOUND`; JSON malformado → 400 `VALIDATION`.
+- [x] `db.int-spec`: `_prisma_migrations` está com RLS ligado (`pg_class.relrowsecurity`).
+- [x] `pnpm --filter @env/api build` e, com o `.env`, `pnpm --filter @env/api start` respondem `/health` com `database: 'up'` (confirma o client Prisma em CommonJS fora do Jest).
 - [ ] Commit `feat(api): endpoint de saúde e tratamento de erros`.
 
 ### Tarefa 4 — Web consumindo `/health` [front]
