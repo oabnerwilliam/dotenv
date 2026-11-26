@@ -53,7 +53,7 @@ meSchema = discriminatedUnion('state', [
 - `Membership(id, teamId, userId unique, role, createdAt)`.
 - `Invite(id, teamId, email, role, status 'pending'|'accepted'|'canceled', invitedById, createdAt)` com índice único parcial `(team_id, email) WHERE status='pending'`.
 - `Project(id, teamId, name, slug, ticketRegex default '[A-Z]+-\d+', defaultDuration 'H4'|'D1'|'D3'|'UNTIL_RELEASED' default 'D1', validateConsistency default true, archivedAt?, createdAt)` único `(teamId, slug)`.
-- [ ] A migração revoga de `anon` e `authenticated` o acesso a tabelas, sequências e funções do schema `public`, também nos privilégios padrão (`ALTER DEFAULT PRIVILEGES`); teste confere que não há concessão.
+- [ ] A migração revoga de `anon` e `authenticated` o acesso a tabelas, sequências e funções do schema `public`, também nos privilégios padrão (`ALTER DEFAULT PRIVILEGES`); teste confere que não há concessão. O teste precisa rodar também onde as concessões existem (banco `postgres`): o `env_test` não as tem e passaria mesmo sem a migração.
 - [ ] `rls.int-spec`: nenhuma tabela do schema `public` com `relrowsecurity = false`; leitura REST no banco de desenvolvimento com a chave pública não retorna linhas.
 - [ ] Commit `feat(api): modelos de equipe e acesso`.
 
@@ -70,6 +70,7 @@ meSchema = discriminatedUnion('state', [
 **Arquivos:** `src/me/*`, `src/team/*`, `src/auth/team.guard.ts`
 **Produz:** `TeamGuard` (padrão nas rotas de negócio) preenche `req.member = { userId, teamId, role }` consultando o banco a cada requisição; `@NoTeam()` para `/me` e `POST /team`; `@AdminOnly()`; `@CurrentMember()`.
 **Regras de `GET /me`:** membro → `member`; senão, e-mail verificado com convite pendente → cria o vínculo, marca `accepted`, `member`; senão, sem equipe e e-mail = `OWNER_EMAIL` → `needs_team`; senão `not_invited`.
+- [ ] **Antes da primeira transação** (achado da revisão da 01): em `PrismaService`, acrescentar `statement_timeout: 2500` (menor que o `query_timeout: 3000`). Sem isso, um prazo estourado dentro de uma transação devolve ao pool uma conexão ainda presa na transação antiga, e gravações seguintes podem não ser confirmadas. Com o prazo no servidor, o Postgres cancela a consulta e o `ROLLBACK` roda. int-spec: após estourar o prazo numa transação, a consulta seguinte roda fora dela. Vale também para escritas aninhadas do Prisma.
 - [ ] int-spec: os quatro caminhos; e-mail não verificado → `not_invited`.
 - [ ] `POST /team`: só o dono; cria equipe, admin e primeiro projeto numa transação; duas chamadas simultâneas → um 201 e um 409; outra pessoa → 403.
 - [ ] Não membro em rota com `TeamGuard` → 403 `NOT_INVITED`.
