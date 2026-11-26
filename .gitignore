@@ -10,3 +10,6 @@ test-results/
 !.env.example
 
 .DS_Store
+
+# client do Prisma, gerado
+apps/api/src/generated/

@@ -1,0 +1,9 @@
+packages: ['apps/*', 'packages/*']
+minimumReleaseAge: 4320 # só instala versões com 3 dias de publicadas
+allowBuilds: # pnpm 10 não roda scripts de dependências sem permissão
+  esbuild: true
+  prisma: true
+  '@prisma/engines': true
+  msw: false # o script só serve ao worker de navegador, que não usamos
+overrides:
+  vite: ~7.3.0 # sem isto o Vitest pode puxar o Vite 8

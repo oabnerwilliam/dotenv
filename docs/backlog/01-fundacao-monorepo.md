@@ -67,11 +67,11 @@ Autenticação, telas do produto, publicação.
 
 **Scripts na raiz (primeira versão):** `codegen` (`pnpm --filter @env/shared build`), `lint` (`eslint .`), `typecheck` (`pnpm run codegen && pnpm -r run typecheck`), `test` e `build` (mesmo padrão com `pnpm -r run ...`).
 
-- [ ] Teste `healthSchema aceita database up e down e rejeita outro valor`.
-- [ ] Teste `apiErrorSchema aceita erro com e sem fields e rejeita code desconhecido`.
-- [ ] O lint recusa `dangerouslySetInnerHTML` (`no-restricted-syntax` com seletor `JSXAttribute[name.name='dangerouslySetInnerHTML']`). Conferir com um arquivo temporário, que não é commitado.
-- [ ] Implementar; `pnpm --filter @env/shared build` gera `index.js`, `index.cjs`, `index.d.ts` e `index.d.cts`.
-- [ ] `pnpm install` termina sem aviso de script de build ignorado e `pnpm why vite` mostra só a 7.3.
+- [x] Teste `healthSchema aceita database up e down e rejeita outro valor`.
+- [x] Teste `apiErrorSchema aceita erro com e sem fields e rejeita code desconhecido`.
+- [x] O lint recusa `dangerouslySetInnerHTML` (`no-restricted-syntax` com seletor `JSXAttribute[name.name='dangerouslySetInnerHTML']`). Conferir com um arquivo temporário, que não é commitado.
+- [x] Implementar; `pnpm --filter @env/shared build` gera `index.js`, `index.cjs`, `index.d.ts` e `index.d.cts`.
+- [x] `pnpm install` termina sem aviso de script de build ignorado e `pnpm why vite` mostra só a 7.3.
 - [ ] Commit `chore: monorepo pnpm com pacote shared`.
 
 ### Tarefa 2 — Supabase local e Prisma [back]
