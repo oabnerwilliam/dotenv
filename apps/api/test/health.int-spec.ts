@@ -3,6 +3,7 @@ import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { createApp } from './create-app';
+import { startStallableProxy } from './stallable-proxy';
 
 describe('GET /health', () => {
   let app: INestApplication;
@@ -38,6 +39,40 @@ describe('GET /health', () => {
     expect(headers['x-content-type-options']).toBe('nosniff');
     expect(headers['x-powered-by']).toBeUndefined();
   });
+});
+
+describe('GET /health com uma conexão do pool travada', () => {
+  const directUrl = process.env.DATABASE_URL as string;
+  let proxy: Awaited<ReturnType<typeof startStallableProxy>>;
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    proxy = await startStallableProxy(directUrl);
+    process.env.DATABASE_URL = proxy.url;
+    app = await createApp();
+  });
+
+  afterAll(async () => {
+    // O proxy fecha primeiro: com uma consulta pendurada, o `app.close()` ficaria esperando.
+    await proxy?.close();
+    await app?.close();
+    process.env.DATABASE_URL = directUrl;
+  });
+
+  // O prazo da requisição é folgado em relação ao `query_timeout` (3 s) para não oscilar no CI.
+  const getHealth = () =>
+    request(app.getHttpServer()).get('/health').timeout({ deadline: 8000 }).expect(200);
+
+  it('informa database down em vez de ficar sem resposta, e volta a up depois', async () => {
+    // Abre a conexão que fica guardada no pool.
+    expect((await getHealth()).body).toEqual({ status: 'ok', database: 'up' });
+
+    proxy.stallOpenConnections();
+
+    expect((await getHealth()).body).toEqual({ status: 'ok', database: 'down' });
+    // A conexão travada foi descartada: a consulta seguinte abre outra.
+    expect((await getHealth()).body).toEqual({ status: 'ok', database: 'up' });
+  }, 30_000);
 });
 
 describe('GET /health com o banco fora', () => {

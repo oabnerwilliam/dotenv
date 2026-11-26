@@ -111,7 +111,7 @@ Autenticação, telas do produto, publicação.
 - `src/app.setup.ts`: `configureApp(app, env)` liga `helmet` e CORS. Usado por `main.ts` **e** pelos int-specs, para testar a mesma configuração.
 - `src/app.module.ts`: módulos e `APP_FILTER` com o `ErrorFilter`.
 - `src/config/{env.ts,env.module.ts}`: `loadEnv` com Zod; módulo global que fornece o token `ENV`.
-- `src/prisma/{prisma.module,prisma.service}.ts`: `PrismaService extends PrismaClient` com `new PrismaPg({ connectionString, connectionTimeoutMillis: 3000 })`; importa de `../generated/prisma/client`; **sem** `$connect()` na partida (a API sobe com o banco fora e o `/health` informa); `$disconnect` ao encerrar.
+- `src/prisma/{prisma.module,prisma.service}.ts`: `PrismaService extends PrismaClient` com `new PrismaPg({ connectionString, connectionTimeoutMillis: 3000, query_timeout: 3000 })` (o primeiro prazo só cobre abrir ou obter a conexão; sem o segundo, uma conexão já aberta do pool que trave, com o banco sem responder e o TCP aberto, deixa o `/health` sem resposta, achado da revisão; vale para todas as consultas da API e não para as migrações, que usam o `prisma.config.ts`); importa de `../generated/prisma/client`; **sem** `$connect()` na partida (a API sobe com o banco fora e o `/health` informa); `$disconnect` ao encerrar.
 - `src/health/{health.module,health.controller,health.service}.ts`: `SELECT 1` via `$queryRaw`.
 - `src/common/{app-error.ts,error.filter.ts,zod.pipe.ts,clock.ts,common.module.ts}`.
 - `package.json` (scripts `dev` = `nest start --watch`, `build` = `nest build`, `start` = `node dist/main.js`, `typecheck`, `test` = `jest --runInBand`), `nest-cli.json`, `tsconfig.json`, `tsconfig.build.json`, `jest.config.cjs`, `test/env.setup.ts`, `.env.example` completo.
@@ -134,6 +134,7 @@ Autenticação, telas do produto, publicação.
 - [x] `error.filter.spec`: o erro desconhecido é registrado sem cabeçalhos, corpo, query string nem a mensagem original.
 - [x] `zod.pipe.spec`: entrada inválida vira `AppError` `VALIDATION` com `fields` por caminho.
 - [x] `health.int-spec`: `GET /health` → 200 `{status:'ok',database:'up'}` contra o `env_test`; com o `PrismaService` substituído por um que falha → 200 `database:'down'`.
+- [x] `health.int-spec`: com a conexão do pool travada (proxy TCP em `test/stallable-proxy.ts`, que para de repassar dados sem fechar), `/health` responde `database:'down'` e a consulta seguinte volta a `up`.
 - [x] `health.int-spec`: `Access-Control-Allow-Origin` é sempre `WEB_ORIGIN`, mesmo com outro `Origin`.
 - [x] `health.int-spec`: `/health` traz `content-security-policy`, `strict-transport-security` e `x-content-type-options: nosniff`, e não traz `x-powered-by`.
 - [x] `errors.int-spec`: rota inexistente → 404 `NOT_FOUND`; JSON malformado → 400 `VALIDATION`.
