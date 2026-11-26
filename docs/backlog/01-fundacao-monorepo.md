@@ -146,7 +146,7 @@ Autenticação, telas do produto, publicação.
 - `package.json` (`@env/web`, `"type": "module"`; `@env/shared` como `workspace:*`; `zod`; scripts `dev` = `vite --port 5173 --strictPort`, `build` = `tsc --noEmit && vite build`, `typecheck`, `test` = `vitest run`).
 - `index.html` (`lang="pt-BR"`), `vite.config.ts` (plugins `@vitejs/plugin-react` e `@tailwindcss/vite`), `tsconfig.json` (`module: ESNext`, `moduleResolution: bundler`, `jsx: react-jsx`, `types: ['vite/client']`).
 - `vitest.config.ts`: ambiente `jsdom`, `env.VITE_API_URL: 'http://localhost:3333'`, `setupFiles: ['src/test/setup.ts']`.
-- `src/test/setup.ts`: `@testing-library/jest-dom/vitest`, `cleanup` e servidor `msw/node` com `onUnhandledRequest: 'error'`.
+- `src/test/setup.ts`: `@testing-library/jest-dom/vitest`, `cleanup` e servidor `msw/node` com `onUnhandledRequest: 'error'`. O servidor fica em `src/test/server.ts`, para os testes o importarem sem importar o arquivo de setup.
 - `.env.example`: `VITE_API_URL=http://localhost:3333` (vai para o navegador: sem segredos).
 - `src/main.tsx` (`QueryClientProvider`), `src/index.css` (`@import "tailwindcss";`; tokens e fontes são da história 02, sem hex solto).
 - `src/lib/{env.ts,api.ts,queryKeys.ts}`: `env.ts` valida `VITE_API_URL` com Zod; `queryKeys.health`.
@@ -157,8 +157,8 @@ Autenticação, telas do produto, publicação.
 
 **Tela:** carregando "Consultando a API…"; sucesso "API no ar" com "Banco conectado" ou "Banco indisponível"; falha com `role="alert"` e botão "Tentar de novo" (altura mínima de 44px) que chama `refetch`. Nos testes, `retry: false`.
 
-- [ ] `api.test`: `resposta de erro vira ApiError com status e code`; `falha de rede vira ApiError com status 0`; `resposta fora do contrato vira ApiError INTERNAL`.
-- [ ] `StatusPage.test`: `mostra a API no ar e o banco conectado`; `mostra banco indisponível quando database é down`; `com a API fora, mostra alerta e Tentar de novo refaz a consulta`.
+- [x] `api.test`: `resposta de erro vira ApiError com status e code`; `falha de rede vira ApiError com status 0`; `resposta fora do contrato vira ApiError INTERNAL`.
+- [x] `StatusPage.test`: `mostra a API no ar e o banco conectado`; `mostra banco indisponível quando database é down`; `com a API fora, mostra alerta e Tentar de novo refaz a consulta`.
 - [ ] Commit `feat(web): tela inicial consultando a api`.
 
 ### Tarefa 5 — Portões, e2e, CI e README [back]
