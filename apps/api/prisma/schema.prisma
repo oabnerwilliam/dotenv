@@ -1,0 +1,11 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+  // Sem isto o client importa com `.ts`, e o JavaScript compilado não acharia os arquivos.
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
