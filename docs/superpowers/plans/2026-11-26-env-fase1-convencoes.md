@@ -33,7 +33,22 @@ Fixar por motivo de compatibilidade com Node 22.14 e entre si; não subir de ver
 | @supabase/supabase-js, supabase (CLI) | 2, 2 |
 | @playwright/test, @axe-core/playwright | 1.65, 4 |
 | eslint, typescript-eslint, jsx-a11y, react-hooks | 9, 8, 6, 7 |
-| tsup | 8 |
+| tsup | 8 (a 9 exige Node ≥ 22.18) |
+| @eslint/js, globals, prettier | 9, 17, 3 |
+| @types/node, @types/react, @types/react-dom | 22, 19, 19 |
+| @testing-library/dom, jest-dom | 10, 6 |
+| @nestjs/cli | 11.0 |
+| @nestjs/platform-express, rxjs, reflect-metadata | 11, 7, 0.2 |
+| @types/jest, @types/supertest | 29, 6 |
+| pg, dotenv | 8, 17 |
+
+Detalhe das linhas acima (conferido no npm em 2026-11-26):
+- `supabase` fica exato em `2.122.1` (tag `v2.stable`). A `latest` é a 3.x, que muda comandos e configuração.
+- `prisma`, `@prisma/client` e `@prisma/adapter-pg` ficam exatos em `7.10.1`. A `latest` do `prisma` é uma pré-versão 8.
+- A `latest` já está em outra versão principal para `typescript`, `vite`, `vitest`, `eslint`, `msw`, `@nestjs/*`, `jest` e `tsup`: instalar sempre com a faixa da tabela.
+- ESLint 9 aparece como sem suporte no npm. Mantido porque o `eslint-plugin-jsx-a11y` 6 não aceita o 10.
+- pnpm 10: scripts de build liberados em `allowBuilds`; `vite` preso por `overrides`. A auditoria no CI roda com pnpm 11 via `dlx`, porque o `pnpm audit` do 10 usa um endpoint que o npm está aposentando.
+- API em CommonJS (`module: commonjs`, `moduleResolution: node10`); `shared` publica ESM e CJS. Os scripts da raiz geram `shared` e o client do Prisma antes dos portões (`pnpm run codegen`).
 
 ## Estrutura
 ```
