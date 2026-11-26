@@ -18,3 +18,36 @@ Como membro, quero registrar à mão o que está em cada ambiente.
 
 ## Fora de escopo
 Valor detectado e "restaurar", busca no Jira.
+
+## Plano de implementação
+
+### Contratos (`shared/src/environment-edit.ts`)
+```ts
+editEnvironmentSchema = {
+  version: int, usage: 'free'|'in_use',
+  ticket: { key: ≤40|null, title: ≤200|null, jiraStatus: ≤40|null },
+  devName: ≤80|null, qaName: ≤80|null,
+  services: { serviceId, branch: ≤200|null, deployedAt: datetime|null }[] }
+// resposta: EnvironmentView
+// eventData 'edited' = { changes: Change[] }
+type Change = { field: 'usage'|'ticketKey'|'ticketTitle'|'ticketJiraStatus'|'dev'|'qa'|'branch'|'deployedAt',
+                service?: string, from: string|null, to: string|null }
+diffEnvironment(before: EnvironmentView, input: EditEnvironment): Change[]   // função pura
+```
+
+### Tarefa 1 — Diferenças [back]
+- [ ] Testes: sem mudança → `[]`; vazio e `null` são iguais; mudança de branch inclui o nome do serviço; o texto mantém a caixa.
+- [ ] Commit `feat(shared): diferenças de edição de ambiente`.
+
+### Tarefa 2 — API [back]
+**Rota:** `PATCH /projects/:project/environments/:env/details` (separada do `PATCH` de cadastro da história 06).
+**Regras:** atualização condicionada à versão (`updateMany where {id, version}`), senão 409 `VERSION_CONFLICT`; branch alterada sem `deployedAt` novo → agora; branch removida → `deployedAt null`; `usageSince` muda só com `usage`; ticket com os três campos vazios → sem ticket; um evento `edited` na mesma transação.
+- [ ] int-spec para cada regra, mais: sem mudança não incrementa a versão nem gera evento; `serviceId` de outro projeto → 400; isolamento → 404; dois envios simultâneos → um vence.
+- [ ] Commit `feat(api): edição manual de ambiente`.
+
+### Tarefa 3 — Formulário [designer, depois front]
+**Arquivos:** `docs/design/screens/App-Drawer-Editar.html`; `src/features/environment/EditForm.tsx`; parâmetro `?acao=editar`
+- [ ] Testes: preenchido com os dados atuais; sugestões de membros via `datalist`, aceitando texto livre; data em horário local convertida para UTC; Cancelar descarta; 409 mostra "Outra pessoa alterou este ambiente" com "Recarregar", preservando o digitado até a pessoa decidir.
+- [ ] A atualização automática não sobrescreve o formulário aberto (teste com nova busca durante a digitação).
+- [ ] e2e: editar branches e ver `⚠ 3/4` no card.
+- [ ] Commit `feat(web): editar informações do ambiente`.

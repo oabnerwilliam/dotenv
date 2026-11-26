@@ -21,3 +21,47 @@ Como desenvolvedor, quero o monorepo funcionando de ponta a ponta para as próxi
 
 ## Fora de escopo
 Autenticação, telas do produto, publicação.
+
+## Plano de implementação
+
+**Pré-requisito:** Docker Desktop em execução. Convenções: `docs/superpowers/plans/2026-11-26-env-fase1-convencoes.md`.
+
+### Tarefa 1 — Workspace e `shared` [back]
+**Arquivos:** `package.json` (`packageManager: pnpm@10.33.0`, `engines.node: >=22.14`), `pnpm-workspace.yaml`, `tsconfig.base.json` (`strict`, `noUncheckedIndexedAccess`), `eslint.config.mjs`, `.prettierrc`, `packages/shared/{package.json,tsconfig.json,tsup.config.ts,vitest.config.ts,src/index.ts,src/health.ts,src/health.test.ts}`
+**Produz:** `healthSchema = z.object({ status: z.literal('ok'), database: z.enum(['up','down']) })`; `type Health`. `shared` gera ESM e CJS com tipos (`exports` com `import` e `require`), pois a API é CommonJS e o web é ESM.
+- [ ] Teste `healthSchema aceita database up e down e rejeita outro valor`.
+- [ ] Implementar; `pnpm --filter @env/shared build` gera as duas saídas e os `.d.ts`.
+- [ ] Commit `chore: monorepo pnpm com pacote shared`.
+
+### Tarefa 2 — Supabase local e Prisma [back]
+**Arquivos:** `supabase/config.toml` (via `supabase init`), `apps/api/prisma/schema.prisma`, `apps/api/prisma.config.ts`, migração `0_init`, `scripts/db-test-setup.mjs`
+**Detalhes:** gerador `prisma-client` com `output` em `src/generated/prisma` (ignorado no git) e formato CJS; adaptador `@prisma/adapter-pg`; `prisma.config.ts` carrega o `.env` e lê `DATABASE_URL`. A migração `0_init` só executa `ALTER TABLE "_prisma_migrations" ENABLE ROW LEVEL SECURITY;` (se o Prisma não permitir, usar uma tabela mínima e registrar o motivo).
+**Scripts na raiz:** `db:start`, `db:stop`, `db:migrate`, `db:test:setup` (cria o banco `env_test` se não existir e aplica as migrações nele).
+- [ ] `pnpm db:start && pnpm db:migrate && pnpm db:test:setup` termina sem erro, também na segunda execução.
+- [ ] Commit `chore: supabase local e prisma`.
+
+### Tarefa 3 — API com `/health` [back]
+**Arquivos:** `apps/api/src/{main.ts,app.module.ts}`, `src/config/env.ts`, `src/prisma/{prisma.module,prisma.service}.ts`, `src/health/*`, `src/common/{app-error.ts,error.filter.ts,zod.pipe.ts,clock.ts}`, `packages/shared/src/errors.ts`, `apps/api/.env.example`, configs do Jest
+**Produz:** `loadEnv(source: NodeJS.ProcessEnv): Env` com `PORT` (padrão 3333), `DATABASE_URL`, `WEB_ORIGIN`; `PrismaService`; `AppError`, `ErrorFilter`, `ZodValidationPipe`, `CLOCK`, conforme as convenções.
+- [ ] `env.spec`: `loadEnv({})` lança erro cuja mensagem cita `DATABASE_URL` e `WEB_ORIGIN`.
+- [ ] `error.filter.spec`: `AppError('NOT_FOUND', …)` vira 404 com `{code,message}`; erro desconhecido vira 500 `INTERNAL` sem vazar a mensagem original.
+- [ ] `zod.pipe.spec`: entrada inválida vira 400 `VALIDATION` com `fields` por caminho.
+- [ ] `health.int-spec`: `GET /health` → 200 `{status:'ok',database:'up'}`; com o Prisma falhando → 200 `database:'down'`.
+- [ ] CORS restrito a `WEB_ORIGIN`.
+- [ ] Commit `feat(api): endpoint de saúde e tratamento de erros`.
+
+### Tarefa 4 — Web consumindo `/health` [front]
+**Arquivos:** `apps/web/{index.html,vite.config.ts,vitest.config.ts,.env.example}`, `src/{main.tsx,index.css}`, `src/lib/{api.ts,env.ts,queryKeys.ts}`, `src/pages/StatusPage.tsx` e teste
+**Produz:** `apiFetch` e `ApiError` (convenções); variável `VITE_API_URL`.
+- [ ] `api.test`: resposta de erro vira `ApiError` com `status` e `code`; falha de rede vira `ApiError` com `status 0`.
+- [ ] `StatusPage.test`: mostra "API no ar" e "Banco conectado"; com a API fora, mostra alerta com "Tentar de novo".
+- [ ] Commit `feat(web): tela inicial consultando a api`.
+
+### Tarefa 5 — Portões, e2e, CI e README [back]
+**Arquivos:** `playwright.config.ts`, `e2e/health.spec.ts`, `.github/workflows/ci.yml`, `README.md`, scripts na raiz
+**Scripts:** `dev` (web e API em paralelo, `shared` em watch), `lint`, `typecheck`, `test` (unidade e integração), `test:e2e`, `build`. O `playwright.config` sobe a API (apontando para `env_test`) e o web.
+- [ ] e2e `a tela inicial mostra a API e o banco conectados`.
+- [ ] CI: Node 22, pnpm, `supabase start`, `db:test:setup`, cinco portões, em `pull_request` e push na `main`. Sem segredos.
+- [ ] README: pré-requisitos, primeira execução no Windows, scripts.
+- [ ] Os cinco portões passam localmente e no PR.
+- [ ] Commit `ci: portões de qualidade e guia de execução`.

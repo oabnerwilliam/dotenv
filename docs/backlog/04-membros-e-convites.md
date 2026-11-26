@@ -18,3 +18,37 @@ Como admin, quero convidar colegas por e-mail para que entrem aos poucos.
 
 ## Fora de escopo
 Envio de e-mail, várias equipes por pessoa.
+
+## Plano de implementação
+
+### Contratos (`shared/src/members.ts`)
+```ts
+inviteSchema = { email: e-mail válido após normalizeEmail; role: Role }
+updateMemberSchema = { role: Role }
+membersSchema = { members: {id,userId,name,email,avatarUrl|null,role}[]; invites: {id,email,role,createdAt}[] }
+```
+
+### Tarefa 1 — Desenho [designer]
+**Arquivos:** `docs/design/screens/App-Membros.html` (e estados), `index.html`, `SCREENS.md`
+- [ ] Lista, formulário de convite, confirmação de remoção, visão de membro comum, aviso "Nenhum e-mail é enviado; avise a pessoa", 375px.
+- [ ] Commit `docs(design): tela de membros e convites`.
+
+### Tarefa 2 — API [back]
+**Arquivos:** `src/members/*`, `test/members.int-spec.ts`
+- [ ] `GET /members` para qualquer membro; `POST`, `PATCH` e `DELETE` com `@AdminOnly()` (membro → 403).
+- [ ] `' Ana@Acme.Example '` é salvo normalizado e aceito no primeiro login.
+- [ ] Convidar membro ou convite pendente → 409 com `fields.email`; reconvidar após cancelado funciona.
+- [ ] Membro removido: requisição seguinte → 403 `NOT_INVITED`; o `User` permanece.
+- [ ] Remover ou rebaixar o último admin → 409; duas remoções cruzadas simultâneas entre dois admins deixam um (travar a linha da equipe com `SELECT … FOR UPDATE` na transação).
+- [ ] Ids de outra equipe → 404.
+- [ ] Commit `feat(api): membros e convites`.
+
+### Tarefa 3 — Tela [front]
+**Arquivos:** `src/features/members/{MembersPage,InviteForm,MemberList}.tsx`, rota `/equipe/membros`
+- [ ] Testes: admin convida e vê o pendente; erro no campo; confirmação antes de remover; membro comum não vê ações; 409 do último admin aparece em `Banner`.
+- [ ] Sem a navegação da história 05, a página funciona sozinha e a 05 adiciona o link.
+- [ ] Commit `feat(web): tela de membros`.
+
+### Tarefa 4 — e2e [front]
+- [ ] `e2e/members.spec.ts`: admin convida → pessoa entra → admin remove → pessoa vê sem permissão.
+- [ ] Commit `test: convite ponta a ponta`.
