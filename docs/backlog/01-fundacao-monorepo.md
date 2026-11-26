@@ -1,21 +1,21 @@
 # 01 — Fundação do monorepo
 
-**Estado:** a fazer · **Depende de:** — · **Spec:** §5
+**Estado:** concluída · **Depende de:** — · **Spec:** §5
 
 Como desenvolvedor, quero o monorepo funcionando de ponta a ponta para as próximas histórias começarem sobre uma base verificada.
 
 ## Critérios de aceite
-- [ ] `pnpm install` na raiz instala `apps/web`, `apps/api` e `packages/shared`.
-- [ ] `pnpm dev` sobe web e API juntos.
-- [ ] `GET /health` responde 200 e informa se o banco está acessível.
-- [ ] A tela inicial do web consome `/health` usando um tipo de `packages/shared`.
-- [ ] Supabase local sobe com um comando; Prisma tem a primeira migração.
-- [ ] `lint`, `typecheck`, `test`, `test:e2e` e `build` rodam na raiz e passam, cada um com ao menos um teste real.
-- [ ] GitHub Actions roda os cinco portões em cada PR.
-- [ ] `.env.example` em cada app; a API falha na partida com mensagem clara se faltar variável.
-- [ ] README explica pré-requisitos e como rodar no Windows.
-- [ ] A API envia os cabeçalhos de segurança do `helmet` e não registra dados sensíveis em log.
-- [ ] O CI procura segredos e vulnerabilidades, com permissão só de leitura; o Dependabot está configurado.
+- [x] `pnpm install` na raiz instala `apps/web`, `apps/api` e `packages/shared`.
+- [x] `pnpm dev` sobe web e API juntos.
+- [x] `GET /health` responde 200 e informa se o banco está acessível.
+- [x] A tela inicial do web consome `/health` usando um tipo de `packages/shared`.
+- [x] Supabase local sobe com um comando; Prisma tem a primeira migração.
+- [x] `lint`, `typecheck`, `test`, `test:e2e` e `build` rodam na raiz e passam, cada um com ao menos um teste real.
+- [x] GitHub Actions roda os cinco portões em cada PR.
+- [x] `.env.example` em cada app; a API falha na partida com mensagem clara se faltar variável.
+- [x] README explica pré-requisitos e como rodar no Windows.
+- [x] A API envia os cabeçalhos de segurança do `helmet` e não registra dados sensíveis em log.
+- [x] O CI procura segredos e vulnerabilidades, com permissão só de leitura; o Dependabot está configurado.
 
 ## Notas técnicas
 - TypeScript estrito em todos os pacotes.
@@ -73,7 +73,7 @@ Autenticação, telas do produto, publicação.
 - [x] O lint recusa `dangerouslySetInnerHTML` (`no-restricted-syntax` com seletor `JSXAttribute[name.name='dangerouslySetInnerHTML']`). Conferir com um arquivo temporário, que não é commitado.
 - [x] Implementar; `pnpm --filter @env/shared build` gera `index.js`, `index.cjs`, `index.d.ts` e `index.d.cts`.
 - [x] `pnpm install` termina sem aviso de script de build ignorado e `pnpm why vite` mostra só a 7.3.
-- [ ] Commit `chore: monorepo pnpm com pacote shared`.
+- [x] Commit `chore: monorepo pnpm com pacote shared`.
 
 ### Tarefa 2 — Supabase local e Prisma [back]
 **Arquivos e responsabilidades:**
@@ -104,7 +104,7 @@ Autenticação, telas do produto, publicação.
 
 - [x] Com `apps/api/.env` copiado do exemplo: `pnpm db:start && pnpm db:migrate && pnpm db:test:setup` termina sem erro, também na segunda execução.
 - [x] `pnpm --filter @env/api run generate` funciona sem `.env` e sem `DATABASE_URL`.
-- [ ] Commit `chore: supabase local e prisma`.
+- [x] Commit `chore: supabase local e prisma`.
 
 ### Tarefa 3 — API com `/health` [back]
 **Arquivos e responsabilidades** (em `apps/api`):
@@ -141,7 +141,7 @@ Autenticação, telas do produto, publicação.
 - [x] `errors.int-spec`: rota inexistente → 404 `NOT_FOUND`; JSON malformado → 400 `VALIDATION`.
 - [x] `db.int-spec`: `_prisma_migrations` está com RLS ligado (`pg_class.relrowsecurity`).
 - [x] `pnpm --filter @env/api build` e, com o `.env`, `pnpm --filter @env/api start` respondem `/health` com `database: 'up'` (confirma o client Prisma em CommonJS fora do Jest).
-- [ ] Commit `feat(api): endpoint de saúde e tratamento de erros`.
+- [x] Commit `feat(api): endpoint de saúde e tratamento de erros`.
 
 ### Tarefa 4 — Web consumindo `/health` [front]
 **Arquivos e responsabilidades** (em `apps/web`):
@@ -161,7 +161,7 @@ Autenticação, telas do produto, publicação.
 
 - [x] `api.test`: `resposta de erro vira ApiError com status e code`; `falha de rede vira ApiError com status 0`; `resposta fora do contrato vira ApiError INTERNAL`.
 - [x] `StatusPage.test`: `mostra a API no ar e o banco conectado`; `mostra banco indisponível quando database é down`; `com a API fora, mostra alerta e Tentar de novo refaz a consulta`.
-- [ ] Commit `feat(web): tela inicial consultando a api`.
+- [x] Commit `feat(web): tela inicial consultando a api`.
 
 ### Tarefa 5 — Portões, e2e, CI e README [back]
 **Arquivos e responsabilidades:**
@@ -205,11 +205,11 @@ Passos, em ordem:
 
 - [x] e2e `a tela inicial mostra a API e o banco conectados`.
 - [x] CI conforme acima. Acrescentados `timeout-minutes: 20` e `COREPACK_ENABLE_DOWNLOAD_PROMPT=0` (o corepack não pode esperar confirmação).
-- [ ] Rodar localmente o comando de auditoria e anotar o resultado no PR. Vulnerabilidade alta sem correção dentro das faixas: parar e perguntar.
+- [x] Rodar localmente o comando de auditoria e anotar o resultado no PR. Vulnerabilidade alta sem correção dentro das faixas: parar e perguntar.
   - Local em 2026-11-26: o comando do CI não acusa nada. Sem `--prod` havia uma alta (`effect` 3.20.0, GHSA-7589-6fvf-x4pw, corrigida na 3.22.1), fixada em versão exata pelo `@prisma/config` 7.10.1, sem Prisma 7 mais novo. Ela vem pela CLI do Prisma, que o `pnpm why --prod` mostra como par opcional do `@prisma/client`.
   - Decisão do usuário: forçar a 3.22.1 com o override `'@prisma/config>effect'` em `pnpm-workspace.yaml`, a remover quando um Prisma 7 exigir a versão corrigida. Com ele, `generate`, `validate`, migrações (inclusive num banco `_test` novo) e os cinco portões em estado limpo passaram. A auditoria não acusa nada com `--prod`; sem `--prod` restam duas moderadas (`glob` e `minimatch`, via `@nestjs/cli`) e uma baixa (`esbuild`, via `tsup`).
 - [x] `dependabot.yml` (o `ignore` de versão principal vale nos dois ecossistemas e não bloqueia correções de segurança).
 - [x] Orquestrador: conferir se secret scanning e push protection estão ligados no repositório (ligados, junto com os alertas e correções de segurança do Dependabot).
 - [x] README.
-- [ ] Os cinco portões passam localmente (inclusive num estado limpo, sem `dist` e sem `src/generated`) e no PR. Local: verdes em 2026-11-26; falta o PR.
-- [ ] Commit `ci: portões de qualidade e guia de execução`.
+- [x] Os cinco portões passam localmente (inclusive num estado limpo, sem `dist` e sem `src/generated`) e no PR. Verdes localmente e no PR #3.
+- [x] Commit `ci: portões de qualidade e guia de execução`.
