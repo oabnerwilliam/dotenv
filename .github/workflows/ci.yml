@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# O fluxo só lê o repositório e não usa segredos.
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Portões de qualidade
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      # O corepack baixa o pnpm do `packageManager` sem pedir confirmação.
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+    steps:
+      # Actions fixadas por SHA: uma tag pode ser movida, o commit não.
+      - name: Baixar o código com o histórico completo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Antes de instalar qualquer dependência. O binário só roda se o SHA-256 conferir.
+      - name: Procurar segredos (gitleaks)
+        shell: bash
+        env:
+          GITLEAKS_FILE: gitleaks_8.30.1_linux_x64.tar.gz
+          GITLEAKS_URL: https://github.com/gitleaks/gitleaks/releases/download/v8.30.1
+          GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+        run: |
+          curl --fail --silent --show-error --location --retry 3 \
+            --output "$RUNNER_TEMP/$GITLEAKS_FILE" "$GITLEAKS_URL/$GITLEAKS_FILE"
+          echo "$GITLEAKS_SHA256  $RUNNER_TEMP/$GITLEAKS_FILE" | sha256sum --check --strict
+          mkdir "$RUNNER_TEMP/gitleaks"
+          tar -xzf "$RUNNER_TEMP/$GITLEAKS_FILE" -C "$RUNNER_TEMP/gitleaks" gitleaks
+          "$RUNNER_TEMP/gitleaks/gitleaks" git --redact .
+
+      - name: Instalar o Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.14.0
+          package-manager-cache: false
+
+      - name: Ativar o pnpm
+        run: corepack enable
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      # O `audit` do pnpm 10 usa um endpoint que o npm está aposentando; só este passo usa o 11.
+      - name: Procurar vulnerabilidades
+        run: pnpm dlx pnpm@11.28.0 --pm-on-fail=ignore audit --prod --audit-level high
+
+      - name: Ligar o Supabase local
+        run: pnpm db:start
+
+      - name: Preparar o banco de testes
+        run: pnpm db:test:setup
+
+      - name: Instalar o Chromium do Playwright
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Testes de unidade e integração
+        run: pnpm test
+
+      - name: Testes de ponta a ponta
+        run: pnpm test:e2e
+
+      - name: Build
+        run: pnpm build

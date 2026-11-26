@@ -7,17 +7,20 @@
   },
   "scripts": {
     "codegen": "pnpm --filter @env/shared build && pnpm --filter @env/api run generate",
+    "dev": "pnpm run codegen && pnpm -r --parallel run dev",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:migrate": "pnpm --filter @env/api exec prisma migrate dev && pnpm --filter @env/api run generate",
     "db:test:setup": "node scripts/db-test-setup.mjs",
     "lint": "eslint .",
-    "typecheck": "pnpm run codegen && pnpm -r run typecheck",
+    "typecheck": "pnpm run codegen && tsc --noEmit -p tsconfig.e2e.json && pnpm -r run typecheck",
     "test": "pnpm run codegen && pnpm -r run test",
+    "test:e2e": "pnpm run codegen && playwright test",
     "build": "pnpm run codegen && pnpm -r run build"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@playwright/test": "~1.65.1",
     "@types/node": "^22.20.5",
     "eslint": "^9.39.5",
     "eslint-plugin-jsx-a11y": "^6.10.2",

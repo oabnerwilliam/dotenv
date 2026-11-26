@@ -201,11 +201,12 @@ Passos, em ordem:
 
 **README (PowerShell):** pré-requisitos (Node 22.14, pnpm 10.33, Docker Desktop em execução); primeira execução: `pnpm install`, `Copy-Item apps/api/.env.example apps/api/.env`, o mesmo para `apps/web`, `pnpm db:start`, `pnpm db:migrate`, `pnpm db:test:setup`, `pnpm exec playwright install chromium`, `pnpm dev`; scripts; avisos: fechar o `pnpm dev` antes do e2e; `pnpm test` exige o Supabase ligado; se uma porta falhar, conferir `netsh interface ipv4 show excludedportrange protocol=tcp`. Atualizar a linha "Estado".
 
-- [ ] e2e `a tela inicial mostra a API e o banco conectados`.
-- [ ] CI conforme acima.
+- [x] e2e `a tela inicial mostra a API e o banco conectados`.
+- [x] CI conforme acima. Acrescentados `timeout-minutes: 20` e `COREPACK_ENABLE_DOWNLOAD_PROMPT=0` (o corepack não pode esperar confirmação).
 - [ ] Rodar localmente o comando de auditoria e anotar o resultado no PR. Vulnerabilidade alta sem correção dentro das faixas: parar e perguntar.
-- [ ] `dependabot.yml`.
+  - Local em 2026-11-26: o comando do CI não acusa nada. Sem `--prod` há uma alta (`effect` 3.20.0, GHSA-7589-6fvf-x4pw, corrigida na 3.22.1), fixada em versão exata pelo `@prisma/config` 7.10.1, sem Prisma 7 mais novo. Ela vem pela CLI do Prisma, que o `pnpm why --prod` mostra como par opcional do `@prisma/client`. O trecho vulnerável (`Schema.TemplateLiteral`) não aparece no `@prisma/config`. Decisão pendente.
+- [x] `dependabot.yml` (o `ignore` de versão principal vale nos dois ecossistemas e não bloqueia correções de segurança).
 - [x] Orquestrador: conferir se secret scanning e push protection estão ligados no repositório (ligados, junto com os alertas e correções de segurança do Dependabot).
-- [ ] README.
-- [ ] Os cinco portões passam localmente (inclusive num estado limpo, sem `dist` e sem `src/generated`) e no PR.
+- [x] README.
+- [ ] Os cinco portões passam localmente (inclusive num estado limpo, sem `dist` e sem `src/generated`) e no PR. Local: verdes em 2026-11-26; falta o PR.
 - [ ] Commit `ci: portões de qualidade e guia de execução`.

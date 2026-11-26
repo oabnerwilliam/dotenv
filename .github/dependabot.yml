@@ -1,0 +1,25 @@
+version: 2
+
+updates:
+  # Cobre o workspace inteiro: o lockfile fica na raiz.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    # Alinhado ao `minimumReleaseAge` do pnpm-workspace.yaml.
+    cooldown:
+      default-days: 3
+    # Versão principal é decisão manual (ver as convenções). Não afeta correções de segurança.
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
