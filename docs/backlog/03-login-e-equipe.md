@@ -53,7 +53,7 @@ meSchema = discriminatedUnion('state', [
 - `Membership(id, teamId, userId unique, role, createdAt)`.
 - `Invite(id, teamId, email, role, status 'pending'|'accepted'|'canceled', invitedById, createdAt)` com índice único parcial `(team_id, email) WHERE status='pending'`.
 - `Project(id, teamId, name, slug, ticketRegex default '[A-Z]+-\d+', defaultDuration 'H4'|'D1'|'D3'|'UNTIL_RELEASED' default 'D1', validateConsistency default true, archivedAt?, createdAt)` único `(teamId, slug)`.
-- [ ] A migração revoga de `anon` e `authenticated` o acesso a tabelas, sequências e funções do schema `public`, também nos privilégios padrão (`ALTER DEFAULT PRIVILEGES`); teste confere que não há concessão. O teste precisa rodar também onde as concessões existem (banco `postgres`): o `env_test` não as tem e passaria mesmo sem a migração.
+- [ ] A migração revoga de `anon` e `authenticated` o acesso a tabelas, sequências e funções do schema `public`, também nos privilégios padrão (`ALTER DEFAULT PRIVILEGES`); teste confere que não há concessão. O teste precisa rodar também onde as concessões existem (banco `postgres`): o `env_test` não as tem e passaria mesmo sem a migração. Esses papéis são criados pelo Supabase: a migração só executa o `REVOKE` para o papel que existir (consulta a `pg_roles`), para também rodar num Postgres comum.
 - [ ] `rls.int-spec`: nenhuma tabela do schema `public` com `relrowsecurity = false`; leitura REST no banco de desenvolvimento com a chave pública não retorna linhas.
 - [ ] Commit `feat(api): modelos de equipe e acesso`.
 
