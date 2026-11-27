@@ -56,6 +56,8 @@ SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET=cole-a-chave-secreta
 
 ### Chaves do Supabase local
 
+Os arquivos `apps/api/.env` e `apps/web/.env` nascem dos `.env.example` de cada pasta (veja o [README](../../README.md)). Se eles já existiam antes do login, copie dos exemplos as linhas que faltam.
+
 Com o Docker Desktop ligado, rode:
 
 ```
@@ -63,7 +65,7 @@ pnpm db:start
 pnpm exec supabase status -o env
 ```
 
-### `apps/api/.env` (acrescente)
+### `apps/api/.env`
 
 ```
 SUPABASE_URL=http://127.0.0.1:54321
@@ -71,9 +73,9 @@ SUPABASE_SECRET_KEY=valor-de-SECRET_KEY
 OWNER_EMAIL=o-seu-email-do-google
 ```
 
-`OWNER_EMAIL` é a única conta que pode criar a primeira equipe.
+`OWNER_EMAIL` é a única conta que pode criar a primeira equipe. A API não liga sem essas três variáveis. Deixe `AUTH_TEST_MODE=false`: ele serve só aos testes automatizados.
 
-### `apps/web/.env` (acrescente)
+### `apps/web/.env`
 
 ```
 VITE_SUPABASE_URL=http://127.0.0.1:54321
@@ -84,7 +86,7 @@ Variáveis `VITE_*` vão para o navegador: aqui entra só a chave **publicável*
 
 ## 5. Aplicar e testar
 
-O Supabase lê o `.env` só ao iniciar:
+O Supabase lê o `.env` da raiz só ao iniciar. Feche o `pnpm dev`, se estiver aberto, e rode (parar o Supabase não apaga os dados):
 
 ```
 pnpm db:stop
@@ -96,10 +98,10 @@ pnpm dev
 Abra <http://localhost:5173> (não use `127.0.0.1:5173`) e confira:
 
 - [ ] "Continuar com Google" leva ao Google e volta ao app.
-- [ ] Com o `OWNER_EMAIL`, aparece "Criar equipe" e, depois, a página do projeto.
+- [ ] Com o `OWNER_EMAIL`, aparece "Crie a equipe"; ao clicar em "Criar equipe", abre a página do projeto, com o nome da equipe.
 - [ ] Recarregar a página mantém a sessão.
 - [ ] "Sair" volta para o login.
-- [ ] Com a segunda conta de teste, aparece "sem permissão".
+- [ ] Com a segunda conta de teste, aparece "Você não tem acesso a esta equipe", com o e-mail em uso e o botão "Sair".
 
 ## Problemas comuns
 
@@ -110,4 +112,9 @@ Abra <http://localhost:5173> (não use `127.0.0.1:5173`) e confira:
 | `Unsupported provider: provider is not enabled` | O Supabase não foi reiniciado, ou o `config.toml` ainda não habilita o Google. |
 | `invalid_client` | `.env` da raiz ausente, vazio ou com ID ou chave errados, ou Supabase não reiniciado depois de preenchê-lo. |
 | As chamadas à API falham por CORS | O app foi aberto por `127.0.0.1` em vez de `localhost`. |
+| A API não liga: `Variáveis de ambiente ausentes ou inválidas` | Falta preencher em `apps/api/.env` as variáveis citadas na mensagem. |
+| A página fica em branco e o console diz `Configuração inválida` | Faltam as variáveis `VITE_SUPABASE_*` em `apps/web/.env`. |
+| Volta para o login logo depois de entrar | `SUPABASE_URL` diferente de `http://127.0.0.1:54321` (com `localhost`, por exemplo): a API recusa o token. |
+| "Não foi possível carregar sua conta" | API fora do ar ou `SUPABASE_SECRET_KEY` errada. |
+| O dono vê "Você não tem acesso a esta equipe" | `OWNER_EMAIL` diferente do e-mail da conta do Google. Corrija e reinicie o `pnpm dev`. |
 | Erro de porta ao iniciar o Supabase | Outro Supabase local está ligado; pare-o antes. |

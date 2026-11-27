@@ -227,13 +227,16 @@ React Hook Form com `zodResolver(createTeamSchema)`; `useMutation` no `POST /tea
 - `playwright.config`: `workers: 1`; API com `NODE_ENV=test`, `AUTH_TEST_MODE=true`, `OWNER_EMAIL=dono@acme.example`, limite alto e chaves do `supabase status`; web com as variáveis `VITE_SUPABASE_*`.
 - `resetDb()`: esvazia só o `env_test` (mesma trava `_test`). `loginAs(page, { email, name })`: cria o usuário pela API administrativa local (reaproveitando se existir), entra com senha gerada na hora e grava a sessão em `localStorage['env.auth']` uma única vez (sem `addInitScript`, que reporia a sessão depois de "Sair"). Esses usuários ficam no `auth` do Supabase local: só e-mails `@acme.example`.
 
-- [ ] e2e `sem sessão, a rota protegida leva ao login`.
-- [ ] e2e `o dono cria a equipe e chega ao projeto`; recarregar mantém.
-- [ ] e2e `um estranho vê sem permissão e consegue sair`.
-- [ ] e2e: login, criar equipe e sem permissão sem violações sérias no axe, alvos ≥ 44px e sem rolagem horizontal em 375px.
-- [ ] Guia: projeto no Google Cloud, tela de consentimento (usuários de teste), escopos `openid`, e-mail e perfil, cliente "Aplicativo da Web" com origem `http://localhost:5173` e redirecionamento `http://127.0.0.1:54321/auth/v1/callback`, `.env` da raiz, `apps/api/.env` (`OWNER_EMAIL`, chaves), reiniciar o Supabase, acessar por `localhost:5173` e conferir o login. Sem valores reais.
-- [ ] README com as variáveis novas e o estado do projeto.
-- [ ] Os cinco portões passam. O login real só o usuário consegue testar; os portões não dependem dele.
+- [x] e2e `sem sessão, a rota protegida leva ao login`.
+- [x] e2e `o dono cria a equipe e chega ao projeto`; recarregar mantém.
+- [x] e2e `um estranho vê sem permissão e consegue sair`.
+- [x] e2e: login, criar equipe e sem permissão sem violações sérias no axe, alvos ≥ 44px e sem rolagem horizontal em 375px.
+- [x] Guia: projeto no Google Cloud, tela de consentimento (usuários de teste), escopos `openid`, e-mail e perfil, cliente "Aplicativo da Web" com origem `http://localhost:5173` e redirecionamento `http://127.0.0.1:54321/auth/v1/callback`, `.env` da raiz, `apps/api/.env` (`OWNER_EMAIL`, chaves), reiniciar o Supabase, acessar por `localhost:5173` e conferir o login. Sem valores reais.
+- [x] README com as variáveis novas e o estado do projeto.
+- [x] Os cinco portões passam. O login real só o usuário consegue testar; os portões não dependem dele.
+  - [x] Login real: em 2026-11-27 o usuário testou a entrada com Google em `pnpm dev`, aprovou e pediu para seguir.
+  - Em 2026-11-27 os cinco portões passaram (e2e com 15 testes).
+  - Arquivo além da lista: `e2e/support/a11y.ts` (axe, alvos de 44px e rolagem horizontal), que a `vitrine.spec` passou a usar. A URL do banco de testes e a trava `_test` ficam em `e2e/support/db.ts`, usadas também pelo `playwright.config`.
 - [ ] Commit `test: fluxo de acesso ponta a ponta e guia do oauth`.
 
 ### Cobertura dos critérios

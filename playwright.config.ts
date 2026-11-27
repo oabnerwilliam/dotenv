@@ -1,16 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 import { supabaseStatus } from './apps/api/test/support/supabase-status';
+import { testDatabaseUrl } from './e2e/support/db';
 
 const API_URL = 'http://localhost:3333';
 const WEB_URL = 'http://localhost:5173';
-const DEFAULT_DATABASE_URL = 'postgresql://postgres:postgres@127.0.0.1:54322/env_test';
 
-const databaseUrl = process.env.TEST_DATABASE_URL || DEFAULT_DATABASE_URL;
-
-// Mesma trava do `db:test:setup` e do Jest. A mensagem não cita a URL, que carrega a senha.
-if (!new URL(databaseUrl).pathname.endsWith('_test')) {
-  throw new Error('TEST_DATABASE_URL precisa apontar para um banco terminado em _test.');
-}
+// Recusa qualquer banco que não termine em `_test`.
+const databaseUrl = testDatabaseUrl();
 
 // Endereço e chaves do Supabase local, lidos da CLI para não ficarem escritos no repositório.
 const supabase = supabaseStatus();
@@ -19,6 +15,8 @@ export default defineConfig({
   testDir: 'e2e',
   // No CI, um `test.only` esquecido derruba a execução em vez de pular os outros testes.
   forbidOnly: !!process.env.CI,
+  // Um teste por vez: o `resetDb()` apaga o banco que todos compartilham.
+  workers: 1,
   use: {
     baseURL: WEB_URL,
     trace: 'retain-on-failure',
