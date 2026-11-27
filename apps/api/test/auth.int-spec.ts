@@ -88,6 +88,29 @@ describe('autenticação', () => {
     await expectUnauthenticated(`Bearer ${await auth.signToken({ key: privateKey })}`);
   });
 
+  // O cabeçalho e a assinatura são escolhidos por quem chama: estragá-los nunca pode virar 500.
+  it.each([
+    ['sem kid', { alg: 'ES256' }],
+    ['com kid desconhecido', { alg: 'ES256', kid: 'outra' }],
+    ['com kid numérico', { alg: 'ES256', kid: 5 }],
+    ['com alg numérico', { alg: 1 }],
+    ['RS256 apontando para a chave ES256', { alg: 'RS256', kid: 'chave-de-teste' }],
+    ['com crit desconhecido', { alg: 'ES256', kid: 'chave-de-teste', crit: ['x'], x: 1 }],
+    ['com b64 falso', { alg: 'ES256', kid: 'chave-de-teste', crit: ['b64'], b64: false }],
+    ['em formato de lista', [1]],
+  ])('com cabeçalho do token %s responde 401', async (_label, header) => {
+    const [, payload, signature] = (await auth.signToken()).split('.');
+    const forged = Buffer.from(JSON.stringify(header)).toString('base64url');
+
+    await expectUnauthenticated(`Bearer ${forged}.${payload}.${signature}`);
+  });
+
+  it.each(['', 'AAAA', '!!!!'])('com a assinatura trocada por "%s" responde 401', async (bad) => {
+    const [header, payload] = (await auth.signToken()).split('.');
+
+    await expectUnauthenticated(`Bearer ${header}.${payload}.${bad}`);
+  });
+
   it('com token válido chega à rota, que sabe quem é a pessoa', async () => {
     const token = await auth.signToken({ claims: { sub: SUB } });
 
