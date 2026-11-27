@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App — falha ao carregar a conta</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0D10}
+button,input{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.5}
+a{color:inherit;text-decoration:none}
+.cur{animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #BEF264;outline-offset:2px}
+.btn-acc:not(:disabled):hover{background:rgba(190,242,100,.12) !important}
+.btn-orange:not(:disabled):hover{background:#FB923C !important;color:#0B0D10 !important}
+.btn-ghost:not(:disabled):hover{background:#1A2028 !important}
+.sk{display:block;background:#1B222B;border-radius:4px;animation:sk 1.4s ease-in-out infinite}
+@keyframes sk{50%{opacity:.45}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.page-head{padding:20px 24px}
+.page-main{flex:1;display:flex;flex-direction:column;align-items:center;gap:20px;padding:32px 24px 64px;box-sizing:border-box;min-width:0}
+.card{width:100%;background:#0F1216;border:1px solid #232A33;border-radius:12px;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px;min-width:0}
+.panel{width:100%;max-width:1320px;min-height:560px;border:1px dashed #2F3944;border-radius:12px;background:#0F1216;display:flex;align-items:center;justify-content:center;padding:32px;box-sizing:border-box}
+.panel>div{width:100%;max-width:520px;display:flex;flex-direction:column;align-items:flex-start;gap:16px;min-width:0}
+@media (max-width:639px){.page-head{padding:16px}.page-main{padding:16px 16px 48px}.card{padding:20px}}
+@media (prefers-reduced-motion:reduce){.cur,.sk{animation:none}}
+</style>
+
+</head>
+<body>
+<!-- AuthLayout: scanline, linha de acento, logo e conteúdo centralizado -->
+<div style="position:relative;min-height:100vh;background:#0B0D10;font-family:Inter,system-ui,sans-serif;color:#E6EDF3;display:flex;flex-direction:column">
+<div aria-hidden="true" style="position:fixed;inset:0;pointer-events:none;z-index:50;background:repeating-linear-gradient(0deg,rgba(255,255,255,.022) 0,rgba(255,255,255,.022) 1px,transparent 1px,transparent 3px)"></div>
+<div aria-hidden="true" style="height:2px;background:linear-gradient(90deg,transparent,#BEF264,transparent);opacity:.55"></div>
+<header class="page-head"><span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:21px;font-weight:700">.env<span class="cur" aria-hidden="true" style="color:#BEF264">_</span></span></header>
+<main class="page-main">
+<h1 class="sr">Falha ao carregar a conta</h1>
+<div style="width:100%;max-width:560px"><div role="alert" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;padding:16px;border-radius:8px;border:1px solid rgba(251,146,60,.4);background:rgba(251,146,60,.1);box-sizing:border-box;width:100%"><span style="display:flex;color:#FB923C"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span><div style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:2px"><p style="margin:0;font:600 14.5px Inter,system-ui,sans-serif;color:#FB923C">Não foi possível carregar sua conta</p><div style="font:13.5px/1.5 Inter,system-ui,sans-serif;color:#B4C0CE">Confira sua conexão e tente de novo.</div></div><div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn-orange" type="button" style="height:48px;padding:0 18px;border-radius:6px;font:600 14px Inter,system-ui,sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;box-sizing:border-box;white-space:nowrap;height:44px;border:1px solid #FB923C;background:rgba(251,146,60,.08);color:#FB923C"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg>Tentar de novo</button></div></div></div>
+</main>
+</div>
+
+</body>
+</html>

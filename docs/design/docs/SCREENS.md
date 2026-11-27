@@ -47,16 +47,64 @@ interface Evento { quando: string; ambiente: string; tipo: 'deploy'|'reserva'|'l
 4. **Reservar** (`App-Reservar`), **Bloquear** (`App-Bloquear`), **Liberar** (`App-Liberar`): modais. Select aberto: `App-Select-Aberto`.
 5. **Histórico** (`App-Historico`): filtros Ambiente, Tipo, Período (7 dias, Hoje, 30 dias); eventos agrupados por dia, mais recentes primeiro; cada linha com hora, ambiente (inline com ponto de status), texto (verbo em negrito, branches/tickets em mono) e Tag da origem.
 6. **Configurações** (`App-Config`): painéis **Ambientes** (tabela nome/tag/GitHub environment + Editar; `+ Novo ambiente`), **Serviços** (serviço, repositório, branch base), **Regras** (status do Jira em uso, validar consistência de branch, regex do ticket, liberar automaticamente, prazo padrão). Salvar/Descartar no fim.
-7. **Login** (`App-Login`): "Continuar com GitHub" (principal), separador "ou com e-mail", e-mail/senha, "Criar conta da equipe", "Esqueci a senha".
-8. **Onboarding** (`App-Onb-Empresa` › `-GitHub` › `-Jira`): equipe (nome, endereço/slug mono, primeiro projeto); GitHub (permissões **somente leitura**, repositórios do projeto viram serviços, environments viram ambientes); Jira (endereço, e-mail, token de API, projeto, "Testar conexão", status que contam como "Em uso"). Concluir abre o board. Token guardado criptografado, nunca devolvido ao front.
+7. **Login** (`App-Login`): só `> Continuar com Google`. Sem e-mail, senha ou links. Ver "Acesso (fase 1)".
+8. **Criar equipe** (`App-Onb-Empresa`): nome, endereço (slug em mono) e primeiro projeto, sem stepper. Ver "Acesso (fase 1)". `App-Onb-GitHub` e `App-Onb-Jira` ficam para a fase de integrações.
 
 ## Estados, busca e menu da equipe (artboards no grupo "Estados, busca e menu da equipe")
 - **Board vazio** (`App-Board-Vazio`): painel tracejado com `$ env list --project=atlas`, título "Nenhum ambiente ainda", texto, ações `> Importar do GitHub` (principal) e "Criar ambiente"; mostra quantos environments foram encontrados.
 - **Carregando** (`App-Board-Carregando`): colunas reais com cabeçalho e contagem `–`, cards em esqueleto no formato do card (barras `bg-avatar` com pulso de opacidade; sem animação com `prefers-reduced-motion`). Container `role="status" aria-busy="true"` com texto "Carregando ambientes" para leitor de tela.
 - **Erro de sincronização** (`App-Board-Erro`): faixa `role="alert"` laranja acima do board: título, detalhe com código do erro e idade dos dados mostrados, botões "Tentar de novo" (laranja, com ícone) e "Ver conexões". O indicador de sync vira laranja ("GitHub · falhou · Jira · sincronizado há 12 min"). O board continua visível com os últimos dados.
-- **Sem permissão** (`App-Sem-Permissao`): ícone de cadeado, "Você não tem acesso a este projeto", explicação, `> Pedir acesso`, "Voltar ao Atlas" e lista dos administradores.
+- **Sem permissão** (`App-Sem-Permissao`): ver "Acesso (fase 1)".
 - **Busca ⌘K** (`App-Busca`): diálogo de 640px a 96px do topo; campo de 56px; grupos Ambientes, Tickets, Branches, Pessoas; item selecionado em `accent/10` com texto `accent`; rodapé com atalhos (↑↓ navegar, Enter abrir, Esc fechar). **Sem resultado** (`App-Busca-Vazia`): "Nada encontrado para “zzz”" e dica de como buscar.
 - **Menu da equipe** (`App-Menu-Equipe`): ao clicar no avatar `AC` da nav abre um menu de 320px alinhado à direita (`role="menu"`, `aria-haspopup`, `aria-expanded`): cabeçalho com avatar, nome e `env.app/slug`; Membros (nº de pessoas), Conexões (status GitHub/Jira com ponto verde), Configurações da equipe; "Trocar de equipe" (lista com check na atual) e "Criar nova equipe"; dados do usuário (nome, e-mail) e Sair. Fecha com Esc, clique fora ou ao escolher um item; foco volta ao avatar.
+
+## Acesso (fase 1)
+Todas as telas desta seção usam `AuthLayout` (logo no topo, sem nav, menu lateral ou seletor de projeto; a casca do app chega depois).
+
+### Rotas e estados
+| Rota | Situação | Tela |
+|---|---|---|
+| `/login` | padrão | `App-Login` |
+| `/login` | indo ao Google | `App-Login-Redirecionando` |
+| `/login` | falha ao iniciar ou no retorno | `App-Login-Erro` |
+| `/auth/callback`, rotas protegidas | trocando o código ou consultando `/me` | `App-Sessao-Carregando` |
+| rotas protegidas | `/me` falhou (exceto 401) | `App-Sessao-Erro` |
+| `/onboarding/equipe` | formulário vazio | `App-Onb-Empresa` |
+| `/onboarding/equipe` | erro nos campos | `App-Onb-Empresa-Erro` |
+| `/onboarding/equipe` | enviando | `App-Onb-Empresa-Enviando` |
+| `/onboarding/equipe` | erro geral | `App-Onb-Empresa-Falha` |
+| `/sem-permissao` | não é membro nem convidado | `App-Sem-Permissao` |
+| `/p/:projeto` | membro (provisória) | `App-Projeto-Provisorio` |
+
+`/` exige login e leva o membro ao projeto (no futuro pode virar uma página pública de apresentação). A tela de status da API fica em `/status`, pública. Sessão ausente ou expirada leva a `/login`.
+
+### Login
+- Um único botão. Ao clicar, fica desativado, mantém o rótulo e a linha de situação abaixo mostra "Abrindo o Google…". Se a página voltar do cache do navegador (botão Voltar), o botão volta a ficar ativo.
+- Falha: `Banner` laranja acima do botão, "Não foi possível entrar" / "O login com o Google não foi concluído. Tente de novo." Texto fixo: nunca repetir o parâmetro `error` da URL.
+
+### Criar equipe
+- Começa vazio. O endereço acompanha o nome (slug) até a pessoa editá-lo. O slug do primeiro projeto é derivado do nome e não aparece na tela.
+- Erros ficam abaixo do campo, depois da dica; o foco vai ao primeiro campo com erro. Textos: "Informe o nome da equipe.", "Informe o nome do primeiro projeto.", "Use só letras minúsculas, números e hífens.", "Use ao menos 2 letras ou números no nome do projeto."
+- Enviando: só "Criar equipe" fica desativado; abaixo das ações, "Criando a equipe…".
+- Erro geral: `Banner` laranja entre o último campo e as ações, título "Não foi possível criar a equipe" e, no detalhe, a mensagem da API (sem resposta: "Confira sua conexão e tente de novo."). Os valores digitados ficam. Se a equipe já existir (409), consultar `/me` de novo e seguir para a tela do estado retornado.
+- Ações: `> Criar equipe` (Enter envia) e "Sair". Não há "Voltar".
+
+### Sem permissão
+Painel tracejado com cadeado, `h1` "Você não tem acesso a esta equipe", texto sobre convite, "E-mail em uso" com o e-mail (quebra a linha se for longo) e "Sair". Sem "Pedir acesso", sem lista de administradores e sem nome de equipe ou projeto (quem está de fora não recebe esses dados).
+
+### Sessão
+- Carregando: painel em esqueleto com `role="status"`, `aria-busy="true"` e o texto "Carregando sua sessão" para leitor de tela. Sem pulso com `prefers-reduced-motion`.
+- Falha: `Banner` laranja "Não foi possível carregar sua conta" / "Confira sua conexão e tente de novo." com "Tentar de novo" (laranja, 44px, ícone). Durante a nova tentativa o botão fica desativado. `h1` só para leitor de tela.
+
+### Projeto (provisória)
+`EmptyState` com a linha `$ env status --project=:projeto`, `h1` com o nome da equipe (caixa original), aviso de que o board está em construção (slug do projeto em mono) e "Sair". Será substituída pelo board.
+
+### Sair
+Encerra a sessão só neste navegador, limpa os dados em cache e leva a `/login`, mesmo se o servidor de login falhar.
+
+### Foco e telas estreitas
+- Anel de foco em acento em botões e campos. Ordem do Tab igual à ordem visual.
+- Em 375px: margens de 16px, cartão com padding 20, ações quebram linha se faltar espaço, sem rolagem horizontal. Botões 48px (44px dentro de faixa).
 
 ## Responsivo
 - ≥ 1320px de conteúdo: layout B. Abaixo: o conteúdo ocupa a largura disponível.
