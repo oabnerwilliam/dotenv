@@ -1,6 +1,7 @@
 import { apiErrorSchema, type ErrorCode } from '@env/shared';
 import type { ZodType } from 'zod';
 import { env } from './env';
+import { endLocalSession, supabase } from './supabase';
 
 export class ApiError extends Error {
   constructor(
@@ -22,9 +23,15 @@ export async function apiFetch<T>(
   schema: ZodType<T>,
   init?: RequestInit,
 ): Promise<T> {
+  // O `getSession` renova o token quando ele está para vencer.
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  const headers = new Headers(init?.headers);
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+
   let response: Response;
   try {
-    response = await fetch(`${env.VITE_API_URL}${path}`, init);
+    response = await fetch(`${env.VITE_API_URL}${path}`, { ...init, headers });
   } catch (error) {
     // Cancelamento foi pedido por quem chamou: não é falha de rede.
     if (init?.signal?.aborted) throw error;
@@ -33,6 +40,10 @@ export async function apiFetch<T>(
 
   // Corpo que não é JSON vira `undefined`, que nenhum schema abaixo aceita.
   const body: unknown = await response.json().catch(() => undefined);
+
+  // A API recusou o token: a sessão não vale mais, e o guard de rota leva ao login. Sem token
+  // enviado não há o que encerrar (a renovação pode só ter falhado por falta de rede).
+  if (response.status === 401 && token) await endLocalSession();
 
   if (!response.ok) {
     const failure = apiErrorSchema.safeParse(body);

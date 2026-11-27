@@ -20,6 +20,9 @@ beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterEach(() => {
   cleanup();
   server.resetHandlers();
+  // A sessão do Supabase e o destino do login ficam no armazenamento do navegador.
+  localStorage.clear();
+  sessionStorage.clear();
 });
 
 afterAll(() => server.close());
