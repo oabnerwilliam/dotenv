@@ -13,3 +13,9 @@ test-results/
 
 # client do Prisma, gerado
 apps/api/src/generated/
+
+# skills de IA instaladas pelo Prisma, só locais
+apps/api/.agents/
+apps/api/.claude/
+apps/api/.windsurf/
+apps/api/skills-lock.json
