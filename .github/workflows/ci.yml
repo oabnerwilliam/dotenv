@@ -62,6 +62,13 @@ jobs:
       - name: Preparar o banco de testes
         run: pnpm db:test:setup
 
+      # O `rls.int-spec` consulta o banco `postgres`, o único que a Data API enxerga. No CI ele é
+      # descartável; a URL é a credencial padrão do Supabase local, não é segredo.
+      - name: Migrar o banco padrão do Supabase local
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: pnpm --filter @env/api exec prisma migrate deploy
+
       - name: Instalar o Chromium do Playwright
         run: pnpm exec playwright install --with-deps chromium
 

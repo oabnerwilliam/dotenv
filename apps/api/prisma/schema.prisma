@@ -1,11 +1,115 @@
 generator client {
-  provider     = "prisma-client"
-  output       = "../src/generated/prisma"
-  moduleFormat = "cjs"
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "cjs"
   // Sem isto o client importa com `.ts`, e o JavaScript compilado não acharia os arquivos.
   importFileExtension = "js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// Nomes de tabela e coluna em snake_case no banco (`@map`/`@@map`); camelCase no código.
+
+enum Role {
+  admin
+  member
+
+  @@map("role")
+}
+
+enum InviteStatus {
+  pending
+  accepted
+  canceled
+
+  @@map("invite_status")
+}
+
+enum DefaultDuration {
+  H4
+  D1
+  D3
+  UNTIL_RELEASED
+
+  @@map("default_duration")
+}
+
+model Team {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String   @unique
+  // Fase 1: uma só equipe. Um índice único parcial, escrito em SQL na migração, aceita uma
+  // única linha com `true`. Os testes de isolamento criam a segunda equipe com `false`.
+  singleton Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  memberships Membership[]
+  invites     Invite[]
+  projects    Project[]
+
+  @@map("teams")
+}
+
+model User {
+  id         String  @id @default(uuid()) @db.Uuid
+  // Id da pessoa no Supabase Auth (o `sub` do token).
+  supabaseId String  @unique @map("supabase_id") @db.Uuid
+  // Sempre normalizado (`normalizeEmail`).
+  email      String  @unique
+  name       String
+  avatarUrl  String? @map("avatar_url")
+
+  membership  Membership?
+  sentInvites Invite[]
+
+  @@map("users")
+}
+
+model Membership {
+  id        String   @id @default(uuid()) @db.Uuid
+  teamId    String   @map("team_id") @db.Uuid
+  // Único: uma pessoa pertence a no máximo uma equipe.
+  userId    String   @unique @map("user_id") @db.Uuid
+  role      Role
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  team Team @relation(fields: [teamId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("memberships")
+}
+
+// Um índice único parcial (na migração) permite um só convite pendente por e-mail na equipe.
+model Invite {
+  id          String       @id @default(uuid()) @db.Uuid
+  teamId      String       @map("team_id") @db.Uuid
+  email       String
+  role        Role
+  status      InviteStatus @default(pending)
+  invitedById String       @map("invited_by_id") @db.Uuid
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  team      Team @relation(fields: [teamId], references: [id])
+  invitedBy User @relation(fields: [invitedById], references: [id])
+
+  @@map("invites")
+}
+
+model Project {
+  id                  String          @id @default(uuid()) @db.Uuid
+  teamId              String          @map("team_id") @db.Uuid
+  name                String
+  slug                String
+  ticketRegex         String          @default("[A-Z]+-\\d+") @map("ticket_regex")
+  defaultDuration     DefaultDuration @default(D1) @map("default_duration")
+  validateConsistency Boolean         @default(true) @map("validate_consistency")
+  archivedAt          DateTime?       @map("archived_at") @db.Timestamptz(3)
+  createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([teamId, slug])
+  @@map("projects")
 }
