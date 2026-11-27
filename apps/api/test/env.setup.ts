@@ -11,3 +11,11 @@ if (!new URL(testUrl).pathname.endsWith('_test')) {
 
 process.env.DATABASE_URL = testUrl;
 process.env.WEB_ORIGIN = 'http://localhost:5173';
+// Valores fictícios fixos: os testes assinam os próprios tokens (`test/support/auth.ts`) e não
+// dependem do Supabase nem do Google para entrar.
+process.env.SUPABASE_URL = 'https://supabase.acme.example';
+process.env.SUPABASE_SECRET_KEY = 'chave-secreta-ficticia';
+process.env.OWNER_EMAIL = 'dono@acme.example';
+process.env.AUTH_TEST_MODE = 'false';
+// Alto para um teste não receber 429 por causa de outro; o teste do limite define o seu.
+process.env.RATE_LIMIT_PER_MINUTE = '10000';

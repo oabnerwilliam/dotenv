@@ -1,10 +1,8 @@
-import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expectTargetSizes, seriousViolations } from './support/a11y';
 
 const ACCENT = 'rgb(190, 242, 100)';
 const TRANSPARENT = 'rgba(0, 0, 0, 0)';
-const TARGETS =
-  'button, a[href], input, textarea, [role="combobox"], [role="radio"], [role="switch"], [role="option"]';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/dev/componentes');
@@ -34,13 +32,6 @@ async function openDrawer(page: Page) {
   return drawer;
 }
 
-async function seriousViolations(page: Page) {
-  const { violations } = await new AxeBuilder({ page }).analyze();
-  return violations
-    .filter(({ impact }) => impact === 'serious' || impact === 'critical')
-    .map(({ id, nodes }) => ({ id, targets: nodes.map((node) => node.target.join(' ')) }));
-}
-
 test('a vitrine não tem violações sérias de acessibilidade', async ({ page }) => {
   expect(await seriousViolations(page), 'página').toEqual([]);
 
@@ -67,38 +58,6 @@ test('a vitrine não tem violações sérias de acessibilidade', async ({ page }
   await openDrawer(page);
   expect(await seriousViolations(page), 'drawer aberto').toEqual([]);
 });
-
-/** Mede os alvos visíveis de uma região. Os elementos auxiliares do Radix são `aria-hidden`. */
-function measureTargets(region: Locator) {
-  return region.locator(TARGETS).evaluateAll((elements) =>
-    elements
-      .filter((element) => !element.closest('[aria-hidden="true"]'))
-      .filter((element) => element.checkVisibility({ visibilityProperty: true }))
-      .map((element) => {
-        const { width, height } = element.getBoundingClientRect();
-        return {
-          name:
-            element.getAttribute('aria-label') ??
-            (element.textContent?.trim() || element.outerHTML),
-          iconOnly: element.tagName === 'BUTTON' && !element.textContent?.trim(),
-          width,
-          height,
-        };
-      }),
-  );
-}
-
-async function expectTargetSizes(region: Locator, where: string) {
-  const targets = await measureTargets(region);
-  expect(targets, `${where}: nenhum alvo encontrado`).not.toEqual([]);
-
-  // Folga para arredondamento de subpixel.
-  const small = targets.filter(
-    ({ height, width, iconOnly }) => height < 43.9 || (iconOnly && width < 43.9),
-  );
-  expect(small, where).toEqual([]);
-  return targets;
-}
 
 test('todo alvo tem pelo menos 44px', async ({ page }) => {
   const targets = await expectTargetSizes(page.locator('body'), 'página');

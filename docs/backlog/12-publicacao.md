@@ -23,6 +23,11 @@ Como dono do app, quero a fase 1 no ar para convidar colegas.
 ## Fora de escopo
 Domínio próprio, monitoramento avançado.
 
+## Riscos vindos da revisão da 03 (conferir na publicação)
+- URLs de retorno: o Auth local aceita qualquer porta e caminho em `localhost`. Testar na nuvem se outros caminhos e subdomínios são recusados.
+- Desligar o login por e-mail e senha: ligado, uma conta criada antes com o e-mail de outra pessoa pode fazer a API recusar o login dela.
+- Limite de requisições: rota inexistente (404) e corpo recusado (400/413) não contam.
+
 ## Plano de implementação
 
 **Não é história autônoma:** depende de decisões, contas e segredos do usuário. Só a Tarefa 1 pode rodar em segundo plano.

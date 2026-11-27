@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('a tela usa os tokens do design', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/status');
 
   const body = page.locator('body');
   await expect(body).toHaveCSS('background-color', 'rgb(11, 13, 16)');
@@ -21,7 +21,7 @@ test('as fontes vêm do próprio app', async ({ page }) => {
     if (url.protocol !== 'data:') hosts.add(url.hostname);
   });
 
-  await page.goto('/');
+  await page.goto('/status');
   await expect(page.getByText('API no ar')).toBeVisible();
 
   // `document.fonts.check` responde `true` quando nenhuma face foi declarada. Por isso a

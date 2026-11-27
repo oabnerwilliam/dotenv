@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { Lock } from 'lucide-react';
 import { describe, expect, it } from 'vitest';
 import { EmptyState } from '../EmptyState';
 
@@ -23,6 +24,27 @@ describe('EmptyState', () => {
     expect(screen.getByText('Crie um ambiente para começar.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Criar ambiente' })).toBeInTheDocument();
     expect(screen.getByText('Você pode mudar isso depois.')).toBeInTheDocument();
+  });
+
+  it('como página inteira, o título é h1 e quebra palavras longas', () => {
+    render(
+      <EmptyState headingLevel="h1" title="Acme">
+        Texto.
+      </EmptyState>,
+    );
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Acme' })).toHaveClass('wrap-anywhere');
+  });
+
+  it('com ícone, ele é decorativo e entra no lugar da linha de comando', () => {
+    const { container } = render(
+      <EmptyState icon={Lock} command="env list" title="Sem acesso">
+        Texto.
+      </EmptyState>,
+    );
+
+    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.queryByText('env list')).not.toBeInTheDocument();
   });
 
   it('omite os opcionais ausentes', () => {

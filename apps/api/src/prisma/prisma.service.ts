@@ -13,10 +13,14 @@ export class PrismaService extends PrismaClient implements OnModuleDestroy {
         connectionString: env.DATABASE_URL,
         // O `pg` não tem prazo por padrão. Este limita a espera por uma conexão.
         connectionTimeoutMillis: 3000,
-        // Este limita a espera pela resposta numa conexão já aberta: se o banco para de
-        // responder sem fechar o TCP, só o prazo evita que o `/health` fique pendurado.
-        // Vale para TODAS as consultas da API; uma que precise de mais de 3 s falha. O erro
-        // não cancela a consulta no servidor, então uma escrita ainda pode ser concluída.
+        // Prazo no servidor: o próprio Postgres cancela a consulta que passar de 2,5 s, e a
+        // conexão continua utilizável (numa transação, tudo é desfeito).
+        statement_timeout: 2500,
+        // Prazo no driver, para quando o banco para de responder sem fechar o TCP: sem ele o
+        // `/health` ficaria pendurado. É maior que o do servidor de propósito. Se ele vencesse
+        // primeiro dentro de uma transação, a conexão voltaria ao pool ainda presa nela, e
+        // gravações seguintes poderiam nunca ser confirmadas.
+        // Os dois valem para TODAS as consultas da API; uma que precise de mais tempo falha.
         // As migrações não passam por aqui: a CLI do Prisma usa o `prisma.config.ts`.
         query_timeout: 3000,
       }),

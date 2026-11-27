@@ -1,20 +1,22 @@
 import { defineConfig, devices } from '@playwright/test';
+import { supabaseStatus } from './apps/api/test/support/supabase-status';
+import { testDatabaseUrl } from './e2e/support/db';
 
 const API_URL = 'http://localhost:3333';
 const WEB_URL = 'http://localhost:5173';
-const DEFAULT_DATABASE_URL = 'postgresql://postgres:postgres@127.0.0.1:54322/env_test';
 
-const databaseUrl = process.env.TEST_DATABASE_URL || DEFAULT_DATABASE_URL;
+// Recusa qualquer banco que não termine em `_test`.
+const databaseUrl = testDatabaseUrl();
 
-// Mesma trava do `db:test:setup` e do Jest. A mensagem não cita a URL, que carrega a senha.
-if (!new URL(databaseUrl).pathname.endsWith('_test')) {
-  throw new Error('TEST_DATABASE_URL precisa apontar para um banco terminado em _test.');
-}
+// Endereço e chaves do Supabase local, lidos da CLI para não ficarem escritos no repositório.
+const supabase = supabaseStatus();
 
 export default defineConfig({
   testDir: 'e2e',
   // No CI, um `test.only` esquecido derruba a execução em vez de pular os outros testes.
   forbidOnly: !!process.env.CI,
+  // Um teste por vez: o `resetDb()` apaga o banco que todos compartilham.
+  workers: 1,
   use: {
     baseURL: WEB_URL,
     trace: 'retain-on-failure',
@@ -33,6 +35,15 @@ export default defineConfig({
         PORT: '3333',
         DATABASE_URL: databaseUrl,
         WEB_ORIGIN: WEB_URL,
+        SUPABASE_URL: supabase.API_URL,
+        SUPABASE_SECRET_KEY: supabase.SECRET_KEY,
+        OWNER_EMAIL: 'dono@acme.example',
+        // Login por senha para os testes. A API só aceita com `NODE_ENV=test`, definido apenas
+        // neste processo: no do web, mudaria o build do Vite.
+        NODE_ENV: 'test',
+        AUTH_TEST_MODE: 'true',
+        // Alto: a suíte inteira sai do mesmo IP.
+        RATE_LIMIT_PER_MINUTE: '10000',
       },
     },
     {
@@ -42,6 +53,8 @@ export default defineConfig({
       reuseExistingServer: false,
       env: {
         VITE_API_URL: API_URL,
+        VITE_SUPABASE_URL: supabase.API_URL,
+        VITE_SUPABASE_PUBLISHABLE_KEY: supabase.PUBLISHABLE_KEY,
       },
     },
   ],

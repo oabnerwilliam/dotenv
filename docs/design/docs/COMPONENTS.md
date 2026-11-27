@@ -15,6 +15,14 @@ Variantes (altura 48, `px-[18px]`, `rounded-sm`, `font-sans font-semibold text-s
 | `ghost` (cancelar, secundário) | `line-strong`, texto `fg-soft` | transparente | `surface-hover-2` |
 Ações principais levam o glifo `>` em mono antes do rótulo (`> Reservar`); `Bloquear` leva o ícone `Lock`. Ícone-botão: 44×44, `rounded-md`, borda `line-strong`. Em rodapé de drawer/modal os botões ficam em linha com `flex-1`, quebrando linha se faltar espaço. Botão secundário dentro de tabela: altura 44.
 
+Em envio: `disabled`, rótulo mantido (o nome acessível não muda) e, abaixo, uma linha de situação `role="status"` em `text-[13.5px] text-fg-muted` ("Criando a equipe…"). A região existe antes de ter texto, para o leitor de tela anunciar a troca; vazia, não deve ocupar espaço visível. O texto garante que a situação não dependa só do botão esmaecido.
+
+## AuthLayout e Logo (`app/layout/`)
+- `Logo`: `.env_` em `font-mono font-bold text-[21px]`; o `_` em `text-accent cursor-blink` e `aria-hidden`.
+- `AuthLayout`: coluna com `min-h-dvh`, `.scanline` e `.accent-line`; `<header class="px-4 py-4 sm:px-6 sm:py-5">` com o `Logo`; `<main>` centralizado, `flex-1 items-center gap-5 px-4 pt-4 pb-12 sm:px-6 sm:pt-8 sm:pb-16`.
+- Cartão (login e criar equipe): `w-full rounded-lg border border-line bg-surface-2 p-5 sm:p-7 gap-5`, `max-w-[460px]` no login e `max-w-[560px]` em criar equipe. `h1` 28/600 e texto 15 `fg-soft`.
+- Painel (sem permissão, projeto provisório e esqueleto de sessão): o do `EmptyState`, com `max-w-content`.
+
 ## EnvName (nome do ambiente)
 Sempre minúsculo e mono, dentro de caixa escura (`bg-bg border rounded`), com prompt:
 - `lg` (título do drawer): `$ lyra`, `font-mono font-bold text-[26px]`, padding `8 16`, `rounded-md`, borda na cor do status a 40%; `$` em `fg-muted`.
@@ -92,8 +100,12 @@ Gatilho: botão 44×44 `rounded-md` com iniciais da equipe sobre `accent` (texto
 ## Faixa de alerta (Banner)
 `role="alert"`, `bg-[status]/10 border border-[status]/40 rounded-md p-4`, ícone + título 14.5/600 na cor + detalhe 13.5 `fg-soft` + ações à direita (altura 44).
 
+Falhas de rede ou de envio usam `status="bloqueado"` (laranja). Em caixa estreita, o ícone fica acima do texto e as ações abaixo.
+
 ## Estado vazio (EmptyState)
 Painel `border border-dashed border-line-strong rounded-lg bg-surface-2 min-h-[560px]`, conteúdo alinhado à esquerda em coluna de até 520px: ícone ou linha de comando, título 28/600, texto 15 `fg-soft`, ações, dica opcional.
+
+Quando o painel é a página inteira, o título é `h1` (prop `headingLevel`; padrão `h2`) e quebra palavras longas (`wrap-anywhere`). Prop opcional `icon`: caixa 56×56 `rounded-lg bg-surface border border-line-strong text-fg-muted`, ícone 24 `aria-hidden`, no lugar da linha de comando.
 
 ## Paleta de busca (CommandPalette)
 Dialog 640px, `rounded-lg`, campo de 56px; grupos com rótulo 12/600 `fg-muted`; itens de 48px; selecionado `bg-accent/10 text-accent`; rodapé com `kbd` (mono 11px, borda `line-strong`). Usar `cmdk`.

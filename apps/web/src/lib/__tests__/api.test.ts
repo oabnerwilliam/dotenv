@@ -2,6 +2,7 @@ import { healthSchema } from '@env/shared';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 import { server } from '../../test/server';
+import { logoutAnswers, seedSession, storedSession } from '../../test/session';
 import { ApiError, apiFetch } from '../api';
 
 const HEALTH_URL = 'http://localhost:3333/health';
@@ -75,5 +76,63 @@ describe('apiFetch', () => {
     await expect(fetchHealth({ signal: controller.signal })).rejects.toMatchObject({
       name: 'AbortError',
     });
+  });
+});
+
+describe('apiFetch com a sessão', () => {
+  /** Responde `/health` e guarda o `Authorization` que chegou. */
+  function captureAuthorization() {
+    const received: Array<string | null> = [];
+    server.use(
+      http.get(HEALTH_URL, ({ request }) => {
+        received.push(request.headers.get('Authorization'));
+        return HttpResponse.json({ status: 'ok', database: 'up' });
+      }),
+    );
+    return received;
+  }
+
+  function refuses(status: number, code: string) {
+    server.use(
+      http.get(HEALTH_URL, () => HttpResponse.json({ code, message: 'Recusado.' }, { status })),
+    );
+  }
+
+  it('envia o token da sessão', async () => {
+    seedSession({ accessToken: 'token-do-alex' });
+    const received = captureAuthorization();
+
+    await fetchHealth({ headers: { Accept: 'application/json' } });
+
+    expect(received).toEqual(['Bearer token-do-alex']);
+  });
+
+  it('sem sessão não envia Authorization', async () => {
+    const received = captureAuthorization();
+
+    await fetchHealth();
+
+    expect(received).toEqual([null]);
+  });
+
+  it('401 encerra a sessão deste navegador', async () => {
+    seedSession();
+    const logouts = logoutAnswers(204);
+    refuses(401, 'UNAUTHENTICATED');
+
+    const error = await failureOf(fetchHealth());
+
+    expect(error).toMatchObject({ status: 401, code: 'UNAUTHENTICATED' });
+    expect(storedSession()).toBeNull();
+    expect(logouts).toEqual(['local']);
+  });
+
+  it('outros erros mantêm a sessão', async () => {
+    seedSession();
+    refuses(403, 'NOT_INVITED');
+
+    await failureOf(fetchHealth());
+
+    expect(storedSession()).not.toBeNull();
   });
 });
