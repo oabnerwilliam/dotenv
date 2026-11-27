@@ -24,6 +24,8 @@ Fixar por motivo de compatibilidade com Node 22.14 e entre si; não subir de ver
 | zustand, nuqs | 5, 2 |
 | @nestjs/throttler, helmet | 6, 8 |
 | radix-ui, lucide-react | 1, 1 |
+| @fontsource-variable/inter | 5 |
+| @fontsource-variable/jetbrains-mono | 5 |
 | vitest, jsdom | 4.1, 26.1 |
 | @testing-library/react, user-event, msw | 16, 14, 2 |
 | @nestjs/* (core, common, testing, cli) | 11 |

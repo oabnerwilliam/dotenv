@@ -21,6 +21,7 @@
   --color-surface-hover: #161B22; /* item ativo/hover do menu */
   --color-surface-hover-2: #1A2028; /* hover de botão ghost e de opção de select */
   --color-avatar: #1B222B;
+  --color-scrim: rgb(5 6 8);      /* fundo atrás de drawer e modais; opacidade na classe */
 
   /* Linhas */
   --color-line: #232A33;          /* borda padrão */
