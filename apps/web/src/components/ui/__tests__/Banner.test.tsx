@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { Banner } from './Banner';
+import { Banner } from '../Banner';
 
 describe('Banner', () => {
   it('anuncia como alerta com título, detalhe e ações', () => {

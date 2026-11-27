@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { healthSchema } from './index';
+import { healthSchema } from '../index';
 
 describe('healthSchema', () => {
   it('healthSchema aceita database up e down e rejeita outro valor', () => {

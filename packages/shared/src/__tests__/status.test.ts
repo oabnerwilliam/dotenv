@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { envStatusSchema, STATUS_LABEL } from './index';
+import { envStatusSchema, STATUS_LABEL } from '../index';
 
 describe('status dos ambientes', () => {
   it('STATUS_LABEL cobre os quatro status', () => {

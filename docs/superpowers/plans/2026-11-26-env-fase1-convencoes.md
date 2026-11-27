@@ -54,12 +54,13 @@ Detalhe das linhas acima (conferido no npm em 2026-11-26):
 
 ## Estrutura
 ```
-apps/api/src/<módulo>/{<módulo>.module,controller,service}.ts   testes: *.spec.ts ao lado; integração: apps/api/test/*.int-spec.ts
+apps/api/src/<módulo>/{<módulo>.module,controller,service}.ts   testes: __tests__/*.spec.ts; integração: apps/api/test/*.int-spec.ts
 apps/api/prisma/{schema.prisma,migrations/}
-apps/web/src/{app,pages,features/<área>,components/ui,components/env,lib}   testes: *.test.tsx ao lado
-packages/shared/src/{<área>.ts,index.ts}                        testes: *.test.ts ao lado
+apps/web/src/{app,pages,features/<área>,components/ui,components/env,lib}   testes: __tests__/*.test.{ts,tsx}
+packages/shared/src/{<área>.ts,index.ts}                        testes: __tests__/*.test.ts
 e2e/*.spec.ts · playwright.config.ts na raiz
 ```
+Teste unitário nunca fica solto ao lado do código: vai na pasta `__tests__/` dentro da pasta do arquivo testado (`components/ui/Button.tsx` → `components/ui/__tests__/Button.test.tsx`). O apoio compartilhado dos testes do web continua em `apps/web/src/test/`.
 Pacotes: `@env/web`, `@env/api`, `@env/shared`.
 
 ## Ambiente local

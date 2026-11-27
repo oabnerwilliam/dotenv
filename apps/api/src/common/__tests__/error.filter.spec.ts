@@ -1,6 +1,6 @@
 import { type ArgumentsHost, HttpException, Logger, NotFoundException } from '@nestjs/common';
-import { AppError } from './app-error';
-import { ErrorFilter } from './error.filter';
+import { AppError } from '../app-error';
+import { ErrorFilter } from '../error.filter';
 
 function createHost() {
   const response = {

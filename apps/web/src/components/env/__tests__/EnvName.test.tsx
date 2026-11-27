@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { EnvName } from './EnvName';
+import { EnvName } from '../EnvName';
 
 describe('EnvName', () => {
   it('mantém a caixa original', () => {

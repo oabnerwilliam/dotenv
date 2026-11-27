@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseEnv } from './env';
+import { parseEnv } from '../env';
 
 describe('parseEnv', () => {
   it('cita VITE_API_URL quando ela falta ou não é um endereço http', () => {
