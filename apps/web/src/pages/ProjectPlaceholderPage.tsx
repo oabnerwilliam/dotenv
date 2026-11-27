@@ -24,7 +24,7 @@ export function ProjectPlaceholderPage() {
           {projeto && (
             <>
               {' '}
-              do projeto <span className="font-mono text-[0.93em]">{projeto}</span>
+              do projeto <span className="font-mono text-[0.93em] wrap-anywhere">{projeto}</span>
             </>
           )}{' '}
           ainda está em construção.

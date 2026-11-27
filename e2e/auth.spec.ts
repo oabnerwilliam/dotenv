@@ -75,6 +75,31 @@ test('um estranho vê sem permissão e consegue sair', async ({ page }) => {
   await expect(heading(page, 'Entrar no .env')).toBeVisible();
 });
 
+// O jsdom não mede layout: a quebra de linha de dados longos só aparece num navegador.
+test('nomes longos sem espaços não criam rolagem horizontal no celular', async ({ page }) => {
+  const teamName = 'Equipecomumnomemuitograndesemnenhumespaco1234567890';
+  const projectName = 'Projetocomumnomemuitograndesemnenhumespaco1234';
+  const projectSlug = projectName.toLowerCase().slice(0, 40);
+
+  await loginAs(page, OWNER);
+  await page.goto('/onboarding/equipe');
+  await page.getByRole('textbox', { name: 'Nome da equipe' }).fill(teamName);
+  await page.getByRole('textbox', { name: 'Primeiro projeto' }).fill(projectName);
+  await page.getByRole('button', { name: 'Criar equipe' }).click();
+  await expect(page).toHaveURL(`/p/${projectSlug}`);
+
+  // O endereço aceita qualquer slug, até um bem maior do que o formulário deixaria criar.
+  for (const slug of [projectSlug, 'z'.repeat(200)]) {
+    await page.goto(`/p/${slug}`);
+    await expect(heading(page, teamName)).toBeVisible();
+
+    for (const width of [375, 360, 320]) {
+      await page.setViewportSize({ width, height: 667 });
+      await expectNoHorizontalScroll(page, `projeto com slug de ${slug.length} letras, ${width}px`);
+    }
+  }
+});
+
 test('a tela de login é acessível', async ({ page }) => {
   await page.goto('/login');
   await expect(heading(page, 'Entrar no .env')).toBeVisible();
