@@ -94,7 +94,7 @@ Painel tracejado com cadeado, `h1` "Você não tem acesso a esta equipe", texto 
 
 ### Sessão
 - Carregando: painel em esqueleto com `role="status"`, `aria-busy="true"` e o texto "Carregando sua sessão" para leitor de tela. Sem pulso com `prefers-reduced-motion`.
-- Falha: `Banner` laranja "Não foi possível carregar sua conta" / "Confira sua conexão e tente de novo." com "Tentar de novo" (laranja, 44px, ícone). Durante a nova tentativa o botão fica desativado. `h1` só para leitor de tela.
+- Falha: `Banner` laranja "Não foi possível carregar sua conta" / "Confira sua conexão e tente de novo." com "Tentar de novo" (laranja, 44px, ícone) e "Sair" (ghost, 44px). Durante a nova tentativa só "Tentar de novo" fica desativado. `h1` só para leitor de tela.
 
 ### Projeto (provisória)
 `EmptyState` com a linha `$ env status --project=:projeto`, `h1` com o nome da equipe (caixa original), aviso de que o board está em construção (slug do projeto em mono) e "Sair". Será substituída pelo board.
