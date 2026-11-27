@@ -53,6 +53,12 @@ Se `minimumReleaseAge` recusar, usar versão anterior da mesma faixa. Depois de 
 - **Bundle de produção:** em vez de um teste do Vitest, um script que lê o `dist` depois do `vite build`, dentro do `pnpm build` (o portão e o CI já o rodam). Rodar `build()` dentro do Vitest herdaria `NODE_ENV=test`, deixaria `import.meta.env.DEV` verdadeiro e testaria outro artefato.
 - **Estados na vitrine:** padrão, desativado, erro, marcado e aberto ficam visíveis ou acionáveis; hover e foco são vistos interagindo e cobertos por e2e (sem classes que os simulem).
 
+### Ajustes feitos na implementação (citar no PR)
+- `tsconfig.e2e.json` ganhou `DOM.Iterable`: o `tema.spec` percorre `document.fonts`.
+- **Uma exceção no axe:** só com o select da página aberto, `aria-hidden-focus` em `#root` é descartado. É falso positivo (o Radix prende o foco na lista e cancela o Tab); o mesmo teste confere que Tab e Shift+Tab não saem dela. Nenhuma regra foi desligada.
+- `onBlur` do `Select` e do `ChipRadioGroup` só dispara quando o foco sai do controle (abrir a lista ou trocar de chip não conta), para o React Hook Form não validar no meio do uso.
+- Arquivo novo `components/ui/fieldParts.tsx`: rótulo, caixa e erro comuns a `Field` e `Select`.
+
 ### Tarefa 1 — Status em `shared` [back]
 **Arquivos:** `packages/shared/src/status.ts` (contrato), `status.test.ts`, `index.ts` (exporta).
 **Produz:**
@@ -61,9 +67,9 @@ export const envStatusSchema = z.enum(['livre', 'reservado', 'uso', 'bloqueado']
 export type EnvStatus = z.infer<typeof envStatusSchema>;
 export const STATUS_LABEL: Record<EnvStatus, string>; // Livre, Reservado, Em uso, Bloqueado
 ```
-- [ ] `status.test` `STATUS_LABEL cobre os quatro status`: as chaves são `envStatusSchema.options` e os rótulos são os quatro acima.
-- [ ] `status.test` `envStatusSchema rejeita status desconhecido`.
-- [ ] Commit `feat(shared): status dos ambientes`.
+- [x] `status.test` `STATUS_LABEL cobre os quatro status`: as chaves são `envStatusSchema.options` e os rótulos são os quatro acima.
+- [x] `status.test` `envStatusSchema rejeita status desconhecido`.
+- [x] Commit `feat(shared): status dos ambientes`.
 
 ### Tarefa 2 — Tokens, fontes e base [front]
 **Arquivos e responsabilidades** (em `apps/web`):
@@ -76,10 +82,10 @@ export const STATUS_LABEL: Record<EnvStatus, string>; // Livre, Reservado, Em us
 - `src/test/setup.ts`: stubs que o Radix exige no jsdom (`ResizeObserver`, `Element.prototype.scrollIntoView`, `hasPointerCapture`, `setPointerCapture`, `releasePointerCapture`).
 - `e2e/tema.spec.ts`.
 
-- [ ] e2e `a tela usa os tokens do design`: em `/`, o fundo do `body` é `rgb(11, 13, 16)`, o texto `rgb(230, 237, 243)`, o `body` usa `Inter Variable` e o `h1` usa `JetBrains Mono Variable`.
-- [ ] e2e `as fontes vêm do próprio app`: depois de `document.fonts.ready`, há face `loaded` das duas famílias (não usar só `document.fonts.check`, que responde `true` sem face declarada) e nenhuma requisição saiu de `localhost`.
-- [ ] `check-bundle`: ver falhar sem o `assetsInlineLimit` e passar com ele.
-- [ ] Commit `feat(web): tokens e fontes do design`.
+- [x] e2e `a tela usa os tokens do design`: em `/`, o fundo do `body` é `rgb(11, 13, 16)`, o texto `rgb(230, 237, 243)`, o `body` usa `Inter Variable` e o `h1` usa `JetBrains Mono Variable`.
+- [x] e2e `as fontes vêm do próprio app`: depois de `document.fonts.ready`, há face `loaded` das duas famílias (não usar só `document.fonts.check`, que responde `true` sem face declarada) e nenhuma requisição saiu de `localhost`.
+- [x] `check-bundle`: ver falhar sem o `assetsInlineLimit` e passar com ele.
+- [x] Commit `feat(web): tokens e fontes do design`.
 
 ### Tarefa 3 — Primitivos estáticos [front]
 **Arquivos:** `src/components/ui/{Button,IconButton,Tag,Banner,Skeleton,EmptyState,Avatar}.tsx`, `src/components/env/EnvName.tsx`, testes ao lado; instalar `lucide-react` (ícones 14–18, `strokeWidth` 1.8, `aria-hidden`).
@@ -92,26 +98,26 @@ export const STATUS_LABEL: Record<EnvStatus, string>; // Livre, Reservado, Em us
 - `Avatar({ name, src?, status?: EnvStatus, size?: 32|44 })`: sempre `aria-hidden`; com `status`, `data-status` e borda `status/45`, sem ele `line-strong`; com `src`, imagem `alt=""` e `referrerPolicy="no-referrer"`, voltando às iniciais se falhar; iniciais = primeira letra do primeiro e do último nome, maiúsculas por classe.
 - `EnvName({ name, size: 'lg'|'md'|'sm'|'inline', status?: EnvStatus })`: usa só `span` (vai dentro de títulos e links); `lg` `$` em `fg-muted` e borda `status/40`; `md` e `sm` `>` em `accent`; `inline` sem caixa nem prompt e, com `status`, ponto decorativo de 7px.
 
-- [ ] `Button.test` `prompt é decorativo`: `>` com `aria-hidden` e nome acessível só com o rótulo.
-- [ ] `Button.test` `é type button e responde a Enter e espaço`.
-- [ ] `Button.test` `desativado não dispara clique nem teclado`.
-- [ ] `IconButton.test` `o nome acessível é o label`.
-- [ ] `Banner.test` `anuncia como alerta com título, detalhe e ações`.
-- [ ] `EmptyState.test` `mostra comando, título, texto, ações e dica` e omite os opcionais ausentes.
-- [ ] `Skeleton.test` `é ignorado pelo leitor de tela`.
-- [ ] `EnvName.test` `mantém a caixa original`: o texto no DOM é `Vega`, com a classe `lowercase`.
-- [ ] `EnvName.test` `prompt por tamanho`: `lg` mostra `$`; `md` e `sm` mostram `>`; `inline` não mostra prompt; com `status` expõe `data-status`.
-- [ ] `Avatar.test`: iniciais de `Marina Teste Lima` = `ML` (com espaços sobrando também); nome único = primeira letra; é `aria-hidden`.
-- [ ] `Avatar.test` `status e imagem`: com `status`, `data-status`; com `src`, imagem; após `error`, iniciais.
-- [ ] Commit `feat(web): componentes primitivos`.
+- [x] `Button.test` `prompt é decorativo`: `>` com `aria-hidden` e nome acessível só com o rótulo.
+- [x] `Button.test` `é type button e responde a Enter e espaço`.
+- [x] `Button.test` `desativado não dispara clique nem teclado`.
+- [x] `IconButton.test` `o nome acessível é o label`.
+- [x] `Banner.test` `anuncia como alerta com título, detalhe e ações`.
+- [x] `EmptyState.test` `mostra comando, título, texto, ações e dica` e omite os opcionais ausentes.
+- [x] `Skeleton.test` `é ignorado pelo leitor de tela`.
+- [x] `EnvName.test` `mantém a caixa original`: o texto no DOM é `Vega`, com a classe `lowercase`.
+- [x] `EnvName.test` `prompt por tamanho`: `lg` mostra `$`; `md` e `sm` mostram `>`; `inline` não mostra prompt; com `status` expõe `data-status`.
+- [x] `Avatar.test`: iniciais de `Marina Teste Lima` = `ML` (com espaços sobrando também); nome único = primeira letra; é `aria-hidden`.
+- [x] `Avatar.test` `status e imagem`: com `status`, `data-status`; com `src`, imagem; após `error`, iniciais.
+- [x] Commit `feat(web): componentes primitivos`.
 
 ### Tarefa 4 — Field [front]
 **Arquivos:** `src/components/ui/Field.tsx` e teste.
 **Produz:** `Field({ label, hint?, error?, multiline?, mono?, ...props })`, com as props de `input` ou, com `multiline`, de `textarea` (mínimo 96px), incluindo `ref` (para o `register`). Ids com `useId`.
-- [ ] `Field.test` `o rótulo nomeia o controle e a dica o descreve`.
-- [ ] `Field.test` `erro marca o campo`: `aria-invalid="true"` e `aria-describedby` inclui o texto do erro (e o da dica, se houver); sem erro, não há `aria-invalid`.
-- [ ] `Field.test` `multiline vira textarea e o ref chega ao controle`; desativado não aceita digitação.
-- [ ] Commit `feat(web): campo de texto`.
+- [x] `Field.test` `o rótulo nomeia o controle e a dica o descreve`.
+- [x] `Field.test` `erro marca o campo`: `aria-invalid="true"` e `aria-describedby` inclui o texto do erro (e o da dica, se houver); sem erro, não há `aria-invalid`.
+- [x] `Field.test` `multiline vira textarea e o ref chega ao controle`; desativado não aceita digitação.
+- [x] Commit `feat(web): campo de texto`.
 
 ### Tarefa 5 — Select, Switch e chips [front]
 **Arquivos:** `src/components/ui/{Select,Switch,ChipRadioGroup}.tsx` e testes; instalar `radix-ui` (`import { Select } from 'radix-ui'`).
@@ -120,30 +126,30 @@ export const STATUS_LABEL: Record<EnvStatus, string>; // Livre, Reservado, Em us
 - `Switch({ label, checked, onCheckedChange, disabled?, ref?, onBlur? })`: o `Switch.Root` é a **linha inteira** (mínimo 48px, rótulo à esquerda, trilho 44×26), para o alvo não ficar com 26px.
 - `ChipRadioGroup({ label, value, onValueChange, options, disabled?, ref?, onBlur? })` sobre `RadioGroup`: grupo nomeado pelo rótulo visível, chips de 44px.
 
-- [ ] `Select.test` `abre com Enter, escolhe com setas e Enter` (chama `onValueChange`) e `a opção atual vem marcada` (`aria-selected`).
-- [ ] `Select.test` `Esc fecha sem mudar e devolve o foco ao gatilho`.
-- [ ] `Select.test` `rótulo, erro e desativado`: o combobox é nomeado pelo rótulo (também com `hideLabel`); com `error`, `aria-invalid` e `aria-describedby`; desativado não abre.
-- [ ] `Switch.test` `alterna com espaço e Enter` e expõe `aria-checked`; desativado não alterna.
-- [ ] `ChipRadioGroup.test` `setas movem e marcam`: usar `{ArrowRight>}` com `waitFor` e soltar depois (o Radix só marca se o foco chegar com a tecla pressionada); só um `radio` com `aria-checked="true"`; desativado não muda.
-- [ ] Commit `feat(web): select, switch e chips`.
+- [x] `Select.test` `abre com Enter, escolhe com setas e Enter` (chama `onValueChange`) e `a opção atual vem marcada` (`aria-selected`).
+- [x] `Select.test` `Esc fecha sem mudar e devolve o foco ao gatilho`.
+- [x] `Select.test` `rótulo, erro e desativado`: o combobox é nomeado pelo rótulo (também com `hideLabel`); com `error`, `aria-invalid` e `aria-describedby`; desativado não abre.
+- [x] `Switch.test` `alterna com espaço e Enter` e expõe `aria-checked`; desativado não alterna.
+- [x] `ChipRadioGroup.test` `setas movem e marcam`: usar `{ArrowRight>}` com `waitFor` e soltar depois (o Radix só marca se o foco chegar com a tecla pressionada); só um `radio` com `aria-checked="true"`; desativado não muda.
+- [x] Commit `feat(web): select, switch e chips`.
 
 ### Tarefa 6 — Modal [front]
 **Arquivos:** `src/components/ui/{Modal.tsx,useReturnFocus.ts}` e `Modal.test.tsx` (Radix `Dialog`).
 **Produz:** `Modal({ open, onOpenChange, title: ReactNode, children, footer? })`: 540px, margem lateral de 16px, a 96px do topo, rolagem no corpo se faltar altura, scrim `.72`, X (`IconButton`, "Fechar"), título em `Dialog.Title`.
 **Foco:** sem `Dialog.Trigger`, o Radix **não** devolve o foco sozinho (cancela a restauração padrão e foca um gatilho que não existe). `useReturnFocus` guarda o `document.activeElement` em `onOpenAutoFocus` e, em `onCloseAutoFocus`, chama `preventDefault()` e o foca.
-- [ ] `Modal.test` `é um diálogo nomeado pelo título`.
-- [ ] `Modal.test` `Esc, X e clique no scrim pedem para fechar` (`onOpenChange(false)`).
-- [ ] `Modal.test` `o foco volta ao botão que abriu`, com `open` controlado e botão comum.
-- [ ] `Modal.test` `Tab e Shift+Tab ficam presos dentro`.
-- [ ] `Modal.test` `Esc com o select aberto fecha só o select`.
-- [ ] Commit `feat(web): modal`.
+- [x] `Modal.test` `é um diálogo nomeado pelo título`.
+- [x] `Modal.test` `Esc, X e clique no scrim pedem para fechar` (`onOpenChange(false)`).
+- [x] `Modal.test` `o foco volta ao botão que abriu`, com `open` controlado e botão comum.
+- [x] `Modal.test` `Tab e Shift+Tab ficam presos dentro`.
+- [x] `Modal.test` `Esc com o select aberto fecha só o select`.
+- [x] Commit `feat(web): modal`.
 
 ### Tarefa 7 — Drawer [front]
 **Arquivos:** `src/components/ui/Drawer.tsx` e teste.
 **Produz:** `Drawer({ open, onOpenChange, label: string, status?: EnvStatus, header, children, footer? })`: à direita, `w-full` até 560px, scrim `.62`, `label` em título só para leitor de tela, X ("Fechar painel") ao lado do `header`, corpo com rolagem, rodapé fixo. `status` vira `data-status` no painel (gradiente `status/8` do cabeçalho e cor das seções futuras). Reusa `useReturnFocus`.
-- [ ] `Drawer.test` `é um diálogo nomeado pelo label e expõe data-status`.
-- [ ] `Drawer.test`: Esc, X e scrim fecham; o foco volta à origem; Tab fica preso.
-- [ ] Commit `feat(web): drawer`.
+- [x] `Drawer.test` `é um diálogo nomeado pelo label e expõe data-status`.
+- [x] `Drawer.test`: Esc, X e scrim fecham; o foco volta à origem; Tab fica preso.
+- [x] Commit `feat(web): drawer`.
 
 ### Tarefa 8 — Vitrine [front]
 **Arquivos:**
@@ -152,15 +158,15 @@ export const STATUS_LABEL: Record<EnvStatus, string>; // Livre, Reservado, Em us
 - `apps/web/scripts/check-bundle.mjs`: também falha se achar `Vitrine de componentes`.
 - `e2e/vitrine.spec.ts`; `package.json` da raiz (`@axe-core/playwright`).
 
-- [ ] e2e `a vitrine não tem violações sérias de acessibilidade`: axe sem violações `serious` ou `critical` na página, com o select aberto, com o modal aberto e com o drawer aberto. Não desligar regra sem justificar no PR.
-- [ ] e2e `todo alvo tem pelo menos 44px`: `button`, `a[href]`, `input`, `textarea`, `combobox`, `radio` e `switch` visíveis (ignorar os `aria-hidden` do Radix), na página e nas camadas abertas (inclusive `option`); botões de ícone também com largura ≥ 44; o teste exige que a lista não esteja vazia.
-- [ ] e2e `hover e foco dos botões`: com o mouse sobre `green` e `orange` o fundo vira a cor do status; `accent` e `ghost` deixam de ser transparentes; por Tab, as quatro variantes, o ícone-botão e os campos têm contorno sólido `rgb(190, 242, 100)`; desativado não muda no hover.
-- [ ] e2e `o select aberto fica abaixo do gatilho, com a mesma largura`, dentro do modal e clicável.
-- [ ] e2e `em 375px o drawer ocupa a largura toda e o modal cabe na tela`.
-- [ ] e2e `movimento reduzido desliga a animação do esqueleto` (`emulateMedia`).
-- [ ] `check-bundle`: ver falhar com a vitrine fora do `if (import.meta.env.DEV)` (temporário, sem commit) e passar com a guarda.
-- [ ] Os cinco portões passam.
-- [ ] Commit `feat(web): vitrine de componentes`.
+- [x] e2e `a vitrine não tem violações sérias de acessibilidade`: axe sem violações `serious` ou `critical` na página, com o select aberto, com o modal aberto e com o drawer aberto. Não desligar regra sem justificar no PR.
+- [x] e2e `todo alvo tem pelo menos 44px`: `button`, `a[href]`, `input`, `textarea`, `combobox`, `radio` e `switch` visíveis (ignorar os `aria-hidden` do Radix), na página e nas camadas abertas (inclusive `option`); botões de ícone também com largura ≥ 44; o teste exige que a lista não esteja vazia.
+- [x] e2e `hover e foco dos botões`: com o mouse sobre `green` e `orange` o fundo vira a cor do status; `accent` e `ghost` deixam de ser transparentes; por Tab, as quatro variantes, o ícone-botão e os campos têm contorno sólido `rgb(190, 242, 100)`; desativado não muda no hover.
+- [x] e2e `o select aberto fica abaixo do gatilho, com a mesma largura`, dentro do modal e clicável.
+- [x] e2e `em 375px o drawer ocupa a largura toda e o modal cabe na tela`.
+- [x] e2e `movimento reduzido desliga a animação do esqueleto` (`emulateMedia`).
+- [x] `check-bundle`: ver falhar com a vitrine fora do `if (import.meta.env.DEV)` (temporário, sem commit) e passar com a guarda.
+- [x] Os cinco portões passam.
+- [x] Commit `feat(web): vitrine de componentes`.
 
 ### Cobertura dos critérios
 | Critério | Onde |
