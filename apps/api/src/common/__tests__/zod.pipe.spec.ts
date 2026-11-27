@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { AppError } from './app-error';
-import { ZodValidationPipe } from './zod.pipe';
+import { AppError } from '../app-error';
+import { ZodValidationPipe } from '../zod.pipe';
 
 const pipe = new ZodValidationPipe(
   z.object({

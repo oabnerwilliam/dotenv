@@ -75,6 +75,7 @@ Passam a existir na história 01.
 - Nada de hex solto. Alvos ≥ 44px. Ícones com `aria-hidden` ou `aria-label`.
 - Minúsculas só por classe, nos pontos definidos no `DESIGN.md`; nunca `toLowerCase()` em dados exibidos.
 - Interface em pt-BR.
+- Testes unitários em `__tests__/` dentro da pasta do arquivo testado, nunca soltos ao lado do código. Integração da API em `apps/api/test/`; ponta a ponta em `e2e/`. Vale mesmo quando o plano de uma história citar outro caminho.
 - Repositório **público**: nunca commitar segredos, `.env*` ou nomes e dados reais de empresa ou pessoas. Usar os fictícios (Acme, Atlas, Vega, Lyra, Hydra).
 
 ## Git e GitHub

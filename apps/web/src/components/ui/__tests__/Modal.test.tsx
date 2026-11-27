@@ -2,8 +2,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState, type ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { Modal } from './Modal';
-import { Select } from './Select';
+import { Modal } from '../Modal';
+import { Select } from '../Select';
 
 /** Como uma tela usa o modal: um botão comum e o `open` guardado no estado. */
 function Screen({ children, onOpenChange }: { children?: ReactNode; onOpenChange?: () => void }) {

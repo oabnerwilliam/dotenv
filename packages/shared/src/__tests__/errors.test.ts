@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { apiErrorSchema } from './index';
+import { apiErrorSchema } from '../index';
 
 describe('apiErrorSchema', () => {
   it('apiErrorSchema aceita erro com e sem fields e rejeita code desconhecido', () => {

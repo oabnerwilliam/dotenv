@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
-import { Field } from './Field';
+import { Field } from '../Field';
 
 describe('Field', () => {
   it('o rótulo nomeia o controle e a dica o descreve', () => {

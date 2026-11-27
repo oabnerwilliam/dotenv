@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { ChipRadioGroup } from './ChipRadioGroup';
+import { ChipRadioGroup } from '../ChipRadioGroup';
 
 const OPTIONS = [
   { value: '4h', label: '4 horas' },

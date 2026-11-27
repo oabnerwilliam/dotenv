@@ -1,4 +1,4 @@
-import { loadEnv } from './env';
+import { loadEnv } from '../env';
 
 const VALID = {
   DATABASE_URL: 'postgresql://postgres:postgres@127.0.0.1:54322/env_test',

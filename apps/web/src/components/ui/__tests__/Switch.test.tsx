@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { Switch } from './Switch';
+import { Switch } from '../Switch';
 
 type Props = Partial<Parameters<typeof Switch>[0]>;
 

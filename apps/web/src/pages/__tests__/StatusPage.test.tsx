@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
-import { server } from '../test/server';
-import { StatusPage } from './StatusPage';
+import { server } from '../../test/server';
+import { StatusPage } from '../StatusPage';
 
 const HEALTH_URL = 'http://localhost:3333/health';
 
