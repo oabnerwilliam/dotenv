@@ -45,9 +45,9 @@ Ao criar, copie o **ID do cliente** e a **chave secreta do cliente** na hora: a 
 
 ## 4. Preencher os arquivos `.env`
 
-### `.env` na raiz do repositório (crie o arquivo)
+### `.env` na raiz do repositório
 
-Lido pelo Supabase local.
+Copie o `.env.example` da raiz para `.env` e preencha. É lido pelo Supabase local.
 
 ```
 SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=cole-o-id-do-cliente
@@ -108,6 +108,6 @@ Abra <http://localhost:5173> (não use `127.0.0.1:5173`) e confira:
 | `redirect_uri_mismatch` | O URI de redirecionamento no Google difere de `http://127.0.0.1:54321/auth/v1/callback`. |
 | `access_denied` no Google | A conta não está em **Test users**. |
 | `Unsupported provider: provider is not enabled` | O Supabase não foi reiniciado, ou o `config.toml` ainda não habilita o Google. |
-| `invalid_client` | ID ou chave secreta errados no `.env` da raiz. |
-| O app volta para um endereço errado | O app foi aberto por `127.0.0.1` em vez de `localhost`. |
+| `invalid_client` | `.env` da raiz ausente, vazio ou com ID ou chave errados, ou Supabase não reiniciado depois de preenchê-lo. |
+| As chamadas à API falham por CORS | O app foi aberto por `127.0.0.1` em vez de `localhost`. |
 | Erro de porta ao iniciar o Supabase | Outro Supabase local está ligado; pare-o antes. |
