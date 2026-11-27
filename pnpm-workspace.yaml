@@ -10,3 +10,8 @@ overrides:
   # GHSA-7589-6fvf-x4pw (alta): o `@prisma/config` 7.10.1 fixa o `effect` 3.20.0 e a correção
   # saiu na 3.22.1. Remover quando um Prisma 7 exigir `effect` 3.22.1 ou mais novo.
   '@prisma/config>effect': 3.22.1
+  # GHSA-3g3m-2fjr-6pw4 e GHSA-g3hv-75wg-m249: o `@nestjs/cli` 11 fixa o `glob` 13.0.6, que traz
+  # o `minimatch` 10. Remover quando um `@nestjs/cli` 11 usar `glob` 14.0.2 ou mais novo.
+  '@nestjs/cli>glob': ~14.0.6
+  # GHSA-g7r4-m6w7-qqqr: o `tsup` 8 pede o `esbuild` 0.27. Remover quando pedir 0.28.1 ou mais novo.
+  'tsup>esbuild': ~0.28.2
