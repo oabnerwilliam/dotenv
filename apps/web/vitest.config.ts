@@ -14,5 +14,8 @@ export default defineConfig({
       VITE_SUPABASE_PUBLISHABLE_KEY: 'chave-publicavel-de-teste',
     },
     setupFiles: ['src/test/setup.ts'],
+    // Bem acima do `asyncUtilTimeout` do setup: quando uma busca falha, o erro mostrado é o dela
+    // (com a tela daquele momento), e não só "o teste estourou o prazo".
+    testTimeout: 20_000,
   },
 });

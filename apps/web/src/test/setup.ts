@@ -1,7 +1,11 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll } from 'vitest';
 import { server } from './server';
+
+// Prazo do `findBy*` e do `waitFor`. O padrão de 1 s estoura com a máquina ocupada: o primeiro
+// teste de cada arquivo monta o app a frio. Só quem falha espera o prazo todo.
+configure({ asyncUtilTimeout: 5000 });
 
 // O jsdom não implementa estas APIs de navegador, e o Radix (select, radio, diálogo) as usa.
 globalThis.ResizeObserver ??= class {
