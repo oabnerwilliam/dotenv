@@ -1,25 +1,25 @@
 # 03 — Login e equipe
 
-**Estado:** a fazer · **Depende de:** 02 · **Spec:** §5, §8 · **Telas:** `App-Login`, `App-Onb-Empresa`, `App-Sem-Permissao`
+**Estado:** concluída · **Depende de:** 02 · **Spec:** §5, §8 · **Telas:** `App-Login`, `App-Onb-Empresa`, `App-Sem-Permissao`
 
 Como dono do app, quero entrar com Google e criar minha equipe, sem que desconhecidos acessem nada.
 
 ## Critérios de aceite
-- [ ] A tela de login tem só "Continuar com Google" e funciona via Supabase Auth.
-- [ ] A API recusa com 401 token ausente, expirado, de outro emissor ou com assinatura inválida.
-- [ ] E-mail não verificado é recusado.
-- [ ] Sem equipe existente, só o `OWNER_EMAIL` pode criá-la (nome, slug, primeiro projeto) e vira admin.
-- [ ] Duas tentativas simultâneas de criar a primeira equipe resultam em uma só.
-- [ ] Quem não é membro nem convidado vê "sem permissão", com opção de sair.
-- [ ] Rotas protegidas levam ao login; sessão expirada também.
-- [ ] RLS ligado em todas as tabelas, com teste provando que a chave pública não lê nada.
-- [ ] Toda rota de negócio passa por um guard que resolve a equipe do usuário.
-- [ ] Testes usam tokens assinados localmente, sem depender do Google.
-- [ ] `docs/operacao/google-oauth.md` guia a criação das credenciais.
-- [ ] O login usa PKCE e só retorna para URLs cadastradas.
-- [ ] Excesso de requisições do mesmo IP recebe 429 com mensagem em português.
-- [ ] Os papéis `anon` e `authenticated` não têm acesso às tabelas.
-- [ ] Sair limpa os dados em cache no navegador.
+- [x] A tela de login tem só "Continuar com Google" e funciona via Supabase Auth.
+- [x] A API recusa com 401 token ausente, expirado, de outro emissor ou com assinatura inválida.
+- [x] E-mail não verificado é recusado.
+- [x] Sem equipe existente, só o `OWNER_EMAIL` pode criá-la (nome, slug, primeiro projeto) e vira admin.
+- [x] Duas tentativas simultâneas de criar a primeira equipe resultam em uma só.
+- [x] Quem não é membro nem convidado vê "sem permissão", com opção de sair.
+- [x] Rotas protegidas levam ao login; sessão expirada também.
+- [x] RLS ligado em todas as tabelas, com teste provando que a chave pública não lê nada.
+- [x] Toda rota de negócio passa por um guard que resolve a equipe do usuário.
+- [x] Testes usam tokens assinados localmente, sem depender do Google.
+- [x] `docs/operacao/google-oauth.md` guia a criação das credenciais.
+- [x] O login usa PKCE e só retorna para URLs cadastradas.
+- [x] Excesso de requisições do mesmo IP recebe 429 com mensagem em português.
+- [x] Os papéis `anon` e `authenticated` não têm acesso às tabelas.
+- [x] Sair limpa os dados em cache no navegador.
 
 ## Notas técnicas
 - Tabelas: Team, User, Membership, Invite (spec §6). Comparar e-mails normalizados (sem espaços, minúsculos).
@@ -99,11 +99,11 @@ Conferir no npm a versão de `@hookform/resolvers` compatível com Zod 4 e corri
 
 ### T0 — Telas da fase 1 [designer]
 **Arquivos:** `docs/design/screens/{App-Login,App-Onb-Empresa,App-Sem-Permissao}.html`, `docs/design/docs/SCREENS.md`.
-- [ ] Login só com "Continuar com Google"; sem e-mail, senha e links. Estados: redirecionando (botão desativado) e falha no retorno (faixa).
-- [ ] Criar equipe sem o stepper; estados: erro no campo, enviando, faixa de erro geral. Ações "Criar equipe" e "Sair".
-- [ ] Sem permissão fora da casca do app (ela só existe na 05), sem "Pedir acesso" e sem administradores: cadeado, `h1`, texto sobre a equipe, e-mail em uso e "Sair".
-- [ ] Carregando a sessão, falha ao consultar `/me` ("Tentar de novo") e página provisória de projeto (nome da equipe e "Sair"). Desktop e 375px.
-- [ ] Commit `docs(design): telas de acesso da fase 1`.
+- [x] Login só com "Continuar com Google"; sem e-mail, senha e links. Estados: redirecionando (botão desativado) e falha no retorno (faixa).
+- [x] Criar equipe sem o stepper; estados: erro no campo, enviando, faixa de erro geral. Ações "Criar equipe" e "Sair".
+- [x] Sem permissão fora da casca do app (ela só existe na 05), sem "Pedir acesso" e sem administradores: cadeado, `h1`, texto sobre a equipe, e-mail em uso e "Sair".
+- [x] Carregando a sessão, falha ao consultar `/me` ("Tentar de novo") e página provisória de projeto (nome da equipe e "Sair"). Desktop e 375px.
+- [x] Commit `docs(design): telas de acesso da fase 1`.
 
 ### T1 — Contratos em `shared` [back]
 **Arquivos:** `packages/shared/src/{auth.ts,team.ts,index.ts}`, `src/__tests__/{auth,team}.test.ts`.
@@ -112,7 +112,7 @@ Conferir no npm a versão de `@hookform/resolvers` compatível com Zod 4 e corri
 - [x] `team.test` `slugSchema` aceita `acme-2` e recusa maiúsculas, espaços, hífen nas pontas, 1 e 41 caracteres.
 - [x] `team.test` `createTeamSchema` apara espaços e aponta o caminho do erro (`project.name`).
 - [x] `auth.test` `meSchema` aceita os três estados e recusa estado desconhecido.
-- [ ] Commit `feat(shared): contratos de acesso e equipe`.
+- [x] Commit `feat(shared): contratos de acesso e equipe`.
 
 ### T2 — Schema e acesso ao banco [back]
 **Arquivos:** `apps/api/prisma/schema.prisma`, migração `auth_equipe` (`prisma migrate dev --create-only`, depois editar o SQL), `test/rls.int-spec.ts`, `test/support/supabase-status.ts`, `.github/workflows/ci.yml`.
@@ -130,7 +130,7 @@ Os índices parciais são escritos em SQL, **sem** o preview `partialIndexes`. C
 - [x] `rls.int-spec` `a chave pública não lê nenhuma tabela`: para cada tabela, `GET ${API_URL}/rest/v1/<tabela>` com a chave publicável responde 401 com código `42501`; tabela inexistente (404) faz o teste falhar. Ver falhar antes da migração com o `REVOKE`.
 - [x] CI: depois de `db:test:setup`, aplicar `prisma migrate deploy` no banco `postgres` (efêmero no CI). Localmente é o `pnpm db:migrate`.
 - [x] Depois da migração, um segundo `prisma migrate dev` não gera nada (o Prisma não tenta remover os índices parciais). Se tentar, parar e rever: há defeitos conhecidos com predicado booleano quando o preview está ligado.
-- [ ] Commit `feat(api): modelos de equipe e acesso`.
+- [x] Commit `feat(api): modelos de equipe e acesso`.
 
 ### T3 — Token e limite de requisições [back]
 **Arquivos:**
@@ -151,7 +151,7 @@ Os índices parciais são escritos em SQL, **sem** o preview `partialIndexes`. C
 - [x] `auth.int-spec`: rota protegida (controller de teste) sem token ou com token inválido → 401 `UNAUTHENTICATED`; `/health` segue público.
 - [x] `auth.int-spec`: com limite 3, a 4ª requisição do mesmo IP, alternando duas rotas e com token inválido → 429 `RATE_LIMITED` em português; `/health` não conta.
 - [x] `pnpm --filter @env/api build` e `start` sobem com o `jose`; o JWKS local traz chave `ES256`.
-- [ ] Commit `feat(api): autenticação por token do supabase`.
+- [x] Commit `feat(api): autenticação por token do supabase`.
 
 ### T4 — `/me`, equipe e guard de equipe [back]
 **Arquivos:** `src/me/{me.module,me.controller,me.service}.ts`, `src/team/{team.module,team.controller,team.service}.ts`, `src/auth/team.guard.ts`, `src/prisma/prisma.service.ts`, `test/{db,me,team,team-guard}.int-spec.ts`, `test/support/{reset-db,two-teams}.ts`.
@@ -167,7 +167,7 @@ Os índices parciais são escritos em SQL, **sem** o preview `partialIndexes`. C
 - [x] `team.int-spec` (`POST /team`): só o dono (e-mail comparado normalizado); cria equipe, `User`, admin e primeiro projeto numa transação; duas chamadas simultâneas → um 201 e um 409; com equipe existente → 409; outra pessoa ou e-mail não verificado → 403; corpo inválido → 400 com `fields`. Violação de unicidade (`P2002`) vira `CONFLICT`.
 - [x] `team-guard.int-spec` (controller de teste, sem decorator): não membro → 403 `NOT_INVITED`; membro comum em `@AdminOnly` → 403 `FORBIDDEN`; membro removido do banco → 403 na requisição seguinte.
 - [x] `test/support/two-teams.ts` com `createTwoTeams()` (a segunda com `singleton false`), usado nos testes de isolamento das histórias seguintes.
-- [ ] Commit `feat(api): criação da equipe e aceite de convite`.
+- [x] Commit `feat(api): criação da equipe e aceite de convite`.
 
 ### T5 — Sessão no web [front]
 **Arquivos:** `apps/web/src/lib/{env,supabase,auth,api,queryKeys,queryClient,returnPath}` (`.ts`/`.tsx`) e `lib/__tests__/`; `vitest.config.ts`, `.env.example`; variáveis `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`.
@@ -187,7 +187,7 @@ Os índices parciais são escritos em SQL, **sem** o preview `partialIndexes`. C
 - [x] `returnPath.test`: aceita `/p/atlas?x=1`; recusa `//site`, `/\site`, `https://site`, vazio e `/login`.
   - Em 401 a sessão só é encerrada se um token foi enviado (sem token pode ser só a renovação falhando sem rede).
   - Instalados: `@supabase/supabase-js` 2.119, `react-router` 7.18, `react-hook-form` 7.92, `@hookform/resolvers` 7.0 (os três últimos já na T5). O `vitest.config.ts` ganhou `resolve.conditions`: sem isso os testes carregavam duas cópias do `react-router`.
-- [ ] Commit `feat(web): sessão com supabase`.
+- [x] Commit `feat(web): sessão com supabase`.
 
 ### T6 — Rotas e telas de acesso [front]
 **Arquivos:** `src/app/{router.tsx,RequireMember.tsx}`, `src/app/layout/{AuthLayout,Logo}.tsx`, `src/pages/{LoginPage,AuthCallbackPage,NoAccessPage,ProjectPlaceholderPage}.tsx`, `main.tsx`, `__tests__/` ao lado de cada pasta; `e2e/{health,tema}.spec.ts`.
@@ -204,7 +204,7 @@ Os índices parciais são escritos em SQL, **sem** o preview `partialIndexes`. C
 - [x] `health` e `tema` do e2e passam em `/status`; o `check-bundle` continua barrando a vitrine.
   - Ajuste aprovado pelo usuário: a tela de erro ao carregar a sessão ganhou "Sair" (`ghost`, 44px) ao lado de "Tentar de novo", com teste. Design atualizado (`App-Sessao-Erro.html` e `SCREENS.md`).
   - Arquivos além da lista: `pages/HomePage.tsx` e `app/layout/{SessionLoading,SessionError,SignOutButton}.tsx`. Membro sem projeto ativo vê a equipe em `/`; quem já entrou e abre `/login` segue para o destino. `EmptyState` ganhou `headingLevel` e `icon`.
-- [ ] Commit `feat(web): rotas protegidas e login com google`.
+- [x] Commit `feat(web): rotas protegidas e login com google`.
 
 ### T7 — Criar equipe [front]
 **Arquivos:** `src/pages/CreateTeamPage.tsx`, `src/lib/forms.ts` e `__tests__/`.
@@ -215,7 +215,7 @@ React Hook Form com `zodResolver(createTeamSchema)`; `useMutation` no `POST /tea
 - [x] `CreateTeamPage.test` `envia o slug do projeto derivado do nome` e vai ao projeto; botão desativado durante o envio.
 - [x] `CreateTeamPage.test`: nome de projeto que não gera slug válido mostra erro no campo; `fields.slug` da API aparece no campo; 409 mostra `Banner` e consulta `/me` de novo.
   - Os textos de nome do primeiro projeto e de formato do endereço (SCREENS.md) são trocados na tela: as mensagens do `shared` são outras e não foram alteradas.
-- [ ] Commit `feat(web): criação da equipe`.
+- [x] Commit `feat(web): criação da equipe`.
 
 ### T8 — Configuração local, e2e e guia [back]
 **Arquivos:** `supabase/config.toml`, `.env.example` na raiz, `playwright.config.ts`, `e2e/support/{supabase.ts,db.ts,login.ts}`, `e2e/auth.spec.ts`, `docs/operacao/google-oauth.md`, `README.md`.
@@ -237,7 +237,7 @@ React Hook Form com `zodResolver(createTeamSchema)`; `useMutation` no `POST /tea
   - [x] Login real: em 2026-11-27 o usuário testou a entrada com Google em `pnpm dev`, aprovou e pediu para seguir.
   - Em 2026-11-27 os cinco portões passaram (e2e com 15 testes).
   - Arquivo além da lista: `e2e/support/a11y.ts` (axe, alvos de 44px e rolagem horizontal), que a `vitrine.spec` passou a usar. A URL do banco de testes e a trava `_test` ficam em `e2e/support/db.ts`, usadas também pelo `playwright.config`.
-- [ ] Commit `test: fluxo de acesso ponta a ponta e guia do oauth`.
+- [x] Commit `test: fluxo de acesso ponta a ponta e guia do oauth`.
 
 ### Cobertura dos critérios
 | Critério | Onde |

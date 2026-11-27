@@ -19,6 +19,10 @@ Como admin, quero convidar colegas por e-mail para que entrem aos poucos.
 ## Fora de escopo
 Envio de e-mail, várias equipes por pessoa.
 
+## Riscos vindos da revisão da 03 (tratar no plano)
+- `GET /me` responde 500 para sempre quando o e-mail verificado já pertence a outro `User` (`apps/api/src/me/save-user.ts`). Passa a ser alcançável quando houver remoção de membro. Em `team.service.ts`, a mesma colisão apareceria como "A equipe já foi criada".
+- Nomes aceitam caracteres de controle e invisíveis (o caractere nulo gera 500). Recusar no `nameSchema` antes de abrir textos a outros membros.
+
 ## Plano de implementação
 
 ### Contratos (`shared/src/members.ts`)
