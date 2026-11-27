@@ -107,11 +107,11 @@ Conferir no npm a versão de `@hookform/resolvers` compatível com Zod 4 e corri
 
 ### T1 — Contratos em `shared` [back]
 **Arquivos:** `packages/shared/src/{auth.ts,team.ts,index.ts}`, `src/__tests__/{auth,team}.test.ts`.
-- [ ] `auth.test` `normalizeEmail tira espaços e usa minúsculas`.
-- [ ] `team.test` `slugify`: "Estúdio Órion!" vira `estudio-orion`; texto longo é cortado em 40 sem hífen no fim; só símbolos vira `''`.
-- [ ] `team.test` `slugSchema` aceita `acme-2` e recusa maiúsculas, espaços, hífen nas pontas, 1 e 41 caracteres.
-- [ ] `team.test` `createTeamSchema` apara espaços e aponta o caminho do erro (`project.name`).
-- [ ] `auth.test` `meSchema` aceita os três estados e recusa estado desconhecido.
+- [x] `auth.test` `normalizeEmail tira espaços e usa minúsculas`.
+- [x] `team.test` `slugify`: "Estúdio Órion!" vira `estudio-orion`; texto longo é cortado em 40 sem hífen no fim; só símbolos vira `''`.
+- [x] `team.test` `slugSchema` aceita `acme-2` e recusa maiúsculas, espaços, hífen nas pontas, 1 e 41 caracteres.
+- [x] `team.test` `createTeamSchema` apara espaços e aponta o caminho do erro (`project.name`).
+- [x] `auth.test` `meSchema` aceita os três estados e recusa estado desconhecido.
 - [ ] Commit `feat(shared): contratos de acesso e equipe`.
 
 ### T2 — Schema e acesso ao banco [back]
@@ -217,6 +217,8 @@ React Hook Form com `zodResolver(createTeamSchema)`; `useMutation` no `POST /tea
 
 - `config.toml`: `site_url = "http://localhost:5173"`; `additional_redirect_urls = ["http://localhost:5173/auth/callback"]`; `[auth.external.google]` com `enabled = true`, `client_id` e `secret` via `env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)` e `env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)`, lidos do `.env` da raiz. **`pnpm db:start` precisa funcionar sem essas variáveis** (CI); se não funcionar, ajustar sem pôr valores no repositório. O login por e-mail continua ligado no local (o e2e depende dele); a 12 o desliga na nuvem.
 - Pode ser feito antes da T6, para o usuário já testar o login real.
+  - [x] Feito em 2026-11-27: `config.toml`, `.env.example` da raiz e as variáveis do Supabase em `apps/api/.env.example` (`SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `OWNER_EMAIL`) e `apps/web/.env.example`. `pnpm db:start` funciona sem as variáveis do Google, ausentes ou vazias. `AUTH_TEST_MODE` e `RATE_LIMIT_PER_MINUTE` ficam para a T3. Commit `chore: configuração local do login com google` (orquestrador).
+  - O Auth local aceita como retorno qualquer endereço de `localhost` e `127.0.0.1`, mesmo fora da lista; endereço externo cai no `site_url`.
 - `playwright.config`: `workers: 1`; API com `NODE_ENV=test`, `AUTH_TEST_MODE=true`, `OWNER_EMAIL=dono@acme.example`, limite alto e chaves do `supabase status`; web com as variáveis `VITE_SUPABASE_*`.
 - `resetDb()`: esvazia só o `env_test` (mesma trava `_test`). `loginAs(page, { email, name })`: cria o usuário pela API administrativa local (reaproveitando se existir), entra com senha gerada na hora e grava a sessão em `localStorage['env.auth']` uma única vez (sem `addInitScript`, que reporia a sessão depois de "Sair"). Esses usuários ficam no `auth` do Supabase local: só e-mails `@acme.example`.
 
