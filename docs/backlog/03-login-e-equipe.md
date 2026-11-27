@@ -126,10 +126,10 @@ Conferir no npm a versão de `@hookform/resolvers` compatível com Zod 4 e corri
 
 Os índices parciais são escritos em SQL, **sem** o preview `partialIndexes`. Cada tabela nova recebe `ENABLE ROW LEVEL SECURITY`. A migração revoga de `anon` e `authenticated` o acesso a tabelas, sequências e funções do schema `public`, também nos privilégios padrão (`ALTER DEFAULT PRIVILEGES`). Esses papéis são criados pelo Supabase: um bloco `DO` só executa o `REVOKE` para o papel que existir (`pg_roles`), para também rodar num Postgres comum. O `EXECUTE` de funções vem também de `PUBLIC`: não há funções hoje, e a história que criar a primeira precisa revogá-lo.
 
-- [ ] `rls.int-spec` (os dois testes atuais continuam) `anon e authenticated não têm concessão no banco de desenvolvimento`: conexão `pg` só de leitura no banco `postgres` (onde o Supabase concede por padrão; o `env_test` passaria sem a migração). Confere que as tabelas novas existem, que não há concessão de tabela ou sequência e que `pg_default_acl` do papel que migra não concede nada a eles no schema `public`.
-- [ ] `rls.int-spec` `a chave pública não lê nenhuma tabela`: para cada tabela, `GET ${API_URL}/rest/v1/<tabela>` com a chave publicável responde 401 com código `42501`; tabela inexistente (404) faz o teste falhar. Ver falhar antes da migração com o `REVOKE`.
-- [ ] CI: depois de `db:test:setup`, aplicar `prisma migrate deploy` no banco `postgres` (efêmero no CI). Localmente é o `pnpm db:migrate`.
-- [ ] Depois da migração, um segundo `prisma migrate dev` não gera nada (o Prisma não tenta remover os índices parciais). Se tentar, parar e rever: há defeitos conhecidos com predicado booleano quando o preview está ligado.
+- [x] `rls.int-spec` (os dois testes atuais continuam) `anon e authenticated não têm concessão no banco de desenvolvimento`: conexão `pg` só de leitura no banco `postgres` (onde o Supabase concede por padrão; o `env_test` passaria sem a migração). Confere que as tabelas novas existem, que não há concessão de tabela ou sequência e que `pg_default_acl` do papel que migra não concede nada a eles no schema `public`.
+- [x] `rls.int-spec` `a chave pública não lê nenhuma tabela`: para cada tabela, `GET ${API_URL}/rest/v1/<tabela>` com a chave publicável responde 401 com código `42501`; tabela inexistente (404) faz o teste falhar. Ver falhar antes da migração com o `REVOKE`.
+- [x] CI: depois de `db:test:setup`, aplicar `prisma migrate deploy` no banco `postgres` (efêmero no CI). Localmente é o `pnpm db:migrate`.
+- [x] Depois da migração, um segundo `prisma migrate dev` não gera nada (o Prisma não tenta remover os índices parciais). Se tentar, parar e rever: há defeitos conhecidos com predicado booleano quando o preview está ligado.
 - [ ] Commit `feat(api): modelos de equipe e acesso`.
 
 ### T3 — Token e limite de requisições [back]
@@ -144,13 +144,13 @@ Os índices parciais são escritos em SQL, **sem** o preview `partialIndexes`. C
 - `AuthGuard` global, `@Public()`, `@CurrentAuth()`.
 - `RateLimitGuard extends ThrottlerGuard`: uma contagem por IP para a API toda, `ttl` 60 000 ms, lança `AppError('RATE_LIMITED', …)`.
 
-- [ ] `token-verifier.spec` (chaves geradas no teste): aceita token válido; recusa ausente, expirado, sem `exp`, outro emissor, outra audiência, assinatura errada, `alg: none`, HS256 e provider diferente de `google`.
-- [ ] `token-verifier.spec`: `AUTH_TEST_MODE` aceita provider `email`; falha ao buscar as chaves não vira `UNAUTHENTICATED`.
-- [ ] `identity-verifier.spec`: devolve e-mail só da identidade `google` com `email_verified: true`; `user_metadata` com outro e-mail é ignorado; no modo de teste aceita identidade `email` com `email_confirmed_at` e recusa sem ele.
-- [ ] `env.spec`: cita as variáveis novas ausentes; `AUTH_TEST_MODE=true` **falha** com `NODE_ENV` diferente de `test`, inclusive ausente.
-- [ ] `auth.int-spec`: rota protegida (controller de teste) sem token ou com token inválido → 401 `UNAUTHENTICATED`; `/health` segue público.
-- [ ] `auth.int-spec`: com limite 3, a 4ª requisição do mesmo IP, alternando duas rotas e com token inválido → 429 `RATE_LIMITED` em português; `/health` não conta.
-- [ ] `pnpm --filter @env/api build` e `start` sobem com o `jose`; o JWKS local traz chave `ES256`.
+- [x] `token-verifier.spec` (chaves geradas no teste): aceita token válido; recusa ausente, expirado, sem `exp`, outro emissor, outra audiência, assinatura errada, `alg: none`, HS256 e provider diferente de `google`.
+- [x] `token-verifier.spec`: `AUTH_TEST_MODE` aceita provider `email`; falha ao buscar as chaves não vira `UNAUTHENTICATED`.
+- [x] `identity-verifier.spec`: devolve e-mail só da identidade `google` com `email_verified: true`; `user_metadata` com outro e-mail é ignorado; no modo de teste aceita identidade `email` com `email_confirmed_at` e recusa sem ele.
+- [x] `env.spec`: cita as variáveis novas ausentes; `AUTH_TEST_MODE=true` **falha** com `NODE_ENV` diferente de `test`, inclusive ausente.
+- [x] `auth.int-spec`: rota protegida (controller de teste) sem token ou com token inválido → 401 `UNAUTHENTICATED`; `/health` segue público.
+- [x] `auth.int-spec`: com limite 3, a 4ª requisição do mesmo IP, alternando duas rotas e com token inválido → 429 `RATE_LIMITED` em português; `/health` não conta.
+- [x] `pnpm --filter @env/api build` e `start` sobem com o `jose`; o JWKS local traz chave `ES256`.
 - [ ] Commit `feat(api): autenticação por token do supabase`.
 
 ### T4 — `/me`, equipe e guard de equipe [back]
@@ -162,11 +162,11 @@ Os índices parciais são escritos em SQL, **sem** o preview `partialIndexes`. C
 
 > `not_invited` exige `email` no contrato. Quando não houver e-mail verificado, usar o claim `email` do token **só para exibir**; nenhuma decisão se baseia nele. O `TokenVerifier` passa a devolver também `claimedEmail`.
 
-- [ ] **Antes da primeira transação** (achado da revisão da 01): em `PrismaService`, acrescentar `statement_timeout: 2500` (menor que o `query_timeout: 3000`) e atualizar o comentário. Sem isso, um prazo estourado dentro de uma transação devolve ao pool uma conexão ainda presa na transação antiga, e gravações seguintes podem não ser confirmadas. `db.int-spec`: `pg_sleep` além do prazo numa transação falha por cancelamento no servidor, e as gravações seguintes são vistas por uma conexão `pg` independente.
-- [ ] `me.int-spec`: os quatro caminhos; e-mail não verificado → `not_invited`; convite cancelado não vale; convite com `User` já existente e `supabaseId` novo funciona; duas chamadas simultâneas no aceite → duas respostas `member` e um só vínculo.
-- [ ] `team.int-spec` (`POST /team`): só o dono (e-mail comparado normalizado); cria equipe, `User`, admin e primeiro projeto numa transação; duas chamadas simultâneas → um 201 e um 409; com equipe existente → 409; outra pessoa ou e-mail não verificado → 403; corpo inválido → 400 com `fields`. Violação de unicidade (`P2002`) vira `CONFLICT`.
-- [ ] `team-guard.int-spec` (controller de teste, sem decorator): não membro → 403 `NOT_INVITED`; membro comum em `@AdminOnly` → 403 `FORBIDDEN`; membro removido do banco → 403 na requisição seguinte.
-- [ ] `test/support/two-teams.ts` com `createTwoTeams()` (a segunda com `singleton false`), usado nos testes de isolamento das histórias seguintes.
+- [x] **Antes da primeira transação** (achado da revisão da 01): em `PrismaService`, acrescentar `statement_timeout: 2500` (menor que o `query_timeout: 3000`) e atualizar o comentário. Sem isso, um prazo estourado dentro de uma transação devolve ao pool uma conexão ainda presa na transação antiga, e gravações seguintes podem não ser confirmadas. `db.int-spec`: `pg_sleep` além do prazo numa transação falha por cancelamento no servidor, e as gravações seguintes são vistas por uma conexão `pg` independente.
+- [x] `me.int-spec`: os quatro caminhos; e-mail não verificado → `not_invited`; convite cancelado não vale; convite com `User` já existente e `supabaseId` novo funciona; duas chamadas simultâneas no aceite → duas respostas `member` e um só vínculo.
+- [x] `team.int-spec` (`POST /team`): só o dono (e-mail comparado normalizado); cria equipe, `User`, admin e primeiro projeto numa transação; duas chamadas simultâneas → um 201 e um 409; com equipe existente → 409; outra pessoa ou e-mail não verificado → 403; corpo inválido → 400 com `fields`. Violação de unicidade (`P2002`) vira `CONFLICT`.
+- [x] `team-guard.int-spec` (controller de teste, sem decorator): não membro → 403 `NOT_INVITED`; membro comum em `@AdminOnly` → 403 `FORBIDDEN`; membro removido do banco → 403 na requisição seguinte.
+- [x] `test/support/two-teams.ts` com `createTwoTeams()` (a segunda com `singleton false`), usado nos testes de isolamento das histórias seguintes.
 - [ ] Commit `feat(api): criação da equipe e aceite de convite`.
 
 ### T5 — Sessão no web [front]
@@ -180,11 +180,13 @@ Os índices parciais são escritos em SQL, **sem** o preview `partialIndexes`. C
 - `safeReturnPath(value): string` (só caminho interno; senão `/`), com gravação e leitura em `sessionStorage` (`env.destino`).
 - `queryClient`: sem nova tentativa em erros 4xx.
 
-- [ ] `env.test`: exige as duas variáveis novas.
-- [ ] `api.test` `envia o token da sessão` e `sem sessão não envia Authorization`; `401 encerra a sessão`. Os testes atuais continuam passando.
-- [ ] `auth.test` `signInWithGoogle usa o provedor google e o retorno /auth/callback`.
-- [ ] `auth.test` `sair limpa o cache`, inclusive quando o Supabase responde erro; `SIGNED_OUT` vindo de fora também limpa.
-- [ ] `returnPath.test`: aceita `/p/atlas?x=1`; recusa `//site`, `/\site`, `https://site`, vazio e `/login`.
+- [x] `env.test`: exige as duas variáveis novas.
+- [x] `api.test` `envia o token da sessão` e `sem sessão não envia Authorization`; `401 encerra a sessão`. Os testes atuais continuam passando.
+- [x] `auth.test` `signInWithGoogle usa o provedor google e o retorno /auth/callback`.
+- [x] `auth.test` `sair limpa o cache`, inclusive quando o Supabase responde erro; `SIGNED_OUT` vindo de fora também limpa.
+- [x] `returnPath.test`: aceita `/p/atlas?x=1`; recusa `//site`, `/\site`, `https://site`, vazio e `/login`.
+  - Em 401 a sessão só é encerrada se um token foi enviado (sem token pode ser só a renovação falhando sem rede).
+  - Instalados: `@supabase/supabase-js` 2.119, `react-router` 7.18, `react-hook-form` 7.92, `@hookform/resolvers` 7.0 (os três últimos já na T5). O `vitest.config.ts` ganhou `resolve.conditions`: sem isso os testes carregavam duas cópias do `react-router`.
 - [ ] Commit `feat(web): sessão com supabase`.
 
 ### T6 — Rotas e telas de acesso [front]
@@ -194,22 +196,25 @@ Os índices parciais são escritos em SQL, **sem** o preview `partialIndexes`. C
 
 **`RequireMember`:** carregando → esqueleto com `role="status"`; sem sessão → grava o destino e vai a `/login`; erro de `/me` (não 401) → `Banner` com "Tentar de novo"; `needs_team` → `/onboarding/equipe`; `not_invited` → `/sem-permissao`; `member` → conteúdo (`/` → `/p/:defaultProjectSlug`). Onboarding e sem permissão também exigem sessão e redirecionam quem não está naquele estado. O callback espera o `supabase-js` trocar o código (PKCE) e vai ao destino gravado; com `error` na URL, volta ao login com a faixa (texto fixo, sem repetir o parâmetro).
 
-- [ ] `LoginPage.test` `há um único botão, "Continuar com Google", que inicia o login`; falha mostra faixa.
-- [ ] `RequireMember.test`: sem sessão → `/login` guardando o destino; `needs_team` → onboarding; `not_invited` → sem permissão; `member` em `/` → `/p/:slug`; erro mostra "Tentar de novo" e refaz; sessão que expira leva ao login.
-- [ ] `AuthCallbackPage.test`: vai ao destino gravado; destino externo (`//site`) é ignorado; `error` volta ao login.
-- [ ] `NoAccessPage.test`: título em `h1`, e-mail em uso e "Sair" que encerra a sessão.
-- [ ] `ProjectPlaceholderPage.test`: mostra a equipe e "Sair".
-- [ ] `health` e `tema` do e2e passam em `/status`; o `check-bundle` continua barrando a vitrine.
+- [x] `LoginPage.test` `há um único botão, "Continuar com Google", que inicia o login`; falha mostra faixa.
+- [x] `RequireMember.test`: sem sessão → `/login` guardando o destino; `needs_team` → onboarding; `not_invited` → sem permissão; `member` em `/` → `/p/:slug`; erro mostra "Tentar de novo" e refaz; sessão que expira leva ao login.
+- [x] `AuthCallbackPage.test`: vai ao destino gravado; destino externo (`//site`) é ignorado; `error` volta ao login.
+- [x] `NoAccessPage.test`: título em `h1`, e-mail em uso e "Sair" que encerra a sessão.
+- [x] `ProjectPlaceholderPage.test`: mostra a equipe e "Sair".
+- [x] `health` e `tema` do e2e passam em `/status`; o `check-bundle` continua barrando a vitrine.
+  - Ajuste aprovado pelo usuário: a tela de erro ao carregar a sessão ganhou "Sair" (`ghost`, 44px) ao lado de "Tentar de novo", com teste. Design atualizado (`App-Sessao-Erro.html` e `SCREENS.md`).
+  - Arquivos além da lista: `pages/HomePage.tsx` e `app/layout/{SessionLoading,SessionError,SignOutButton}.tsx`. Membro sem projeto ativo vê a equipe em `/`; quem já entrou e abre `/login` segue para o destino. `EmptyState` ganhou `headingLevel` e `icon`.
 - [ ] Commit `feat(web): rotas protegidas e login com google`.
 
 ### T7 — Criar equipe [front]
 **Arquivos:** `src/pages/CreateTeamPage.tsx`, `src/lib/forms.ts` e `__tests__/`.
 **Produz:** `applyApiErrors(error, setError)`: cada `fields` vai ao campo; sem `fields` (ou chave `_`), erro raiz.
 React Hook Form com `zodResolver(createTeamSchema)`; `useMutation` no `POST /team`; no sucesso grava a resposta no cache de `/me` e segue para o projeto. `project.slug = slugify(project.name)`; erro de `project.slug` aparece no campo "Primeiro projeto". Mensagens de validação em português.
-- [ ] `forms.test`: aplica `name` e `project.name`; sem `fields`, vira erro raiz.
-- [ ] `CreateTeamPage.test` `o endereço acompanha o nome até a pessoa editar`.
-- [ ] `CreateTeamPage.test` `envia o slug do projeto derivado do nome` e vai ao projeto; botão desativado durante o envio.
-- [ ] `CreateTeamPage.test`: nome de projeto que não gera slug válido mostra erro no campo; `fields.slug` da API aparece no campo; 409 mostra `Banner` e consulta `/me` de novo.
+- [x] `forms.test`: aplica `name` e `project.name`; sem `fields`, vira erro raiz.
+- [x] `CreateTeamPage.test` `o endereço acompanha o nome até a pessoa editar`.
+- [x] `CreateTeamPage.test` `envia o slug do projeto derivado do nome` e vai ao projeto; botão desativado durante o envio.
+- [x] `CreateTeamPage.test`: nome de projeto que não gera slug válido mostra erro no campo; `fields.slug` da API aparece no campo; 409 mostra `Banner` e consulta `/me` de novo.
+  - Os textos de nome do primeiro projeto e de formato do endereço (SCREENS.md) são trocados na tela: as mensagens do `shared` são outras e não foram alteradas.
 - [ ] Commit `feat(web): criação da equipe`.
 
 ### T8 — Configuração local, e2e e guia [back]
