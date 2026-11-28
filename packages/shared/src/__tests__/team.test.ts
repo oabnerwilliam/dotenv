@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { createTeamSchema, slugify, slugSchema } from '../index';
+import {
+  createProjectSchema,
+  createTeamSchema,
+  slugify,
+  slugSchema,
+  updateProjectSchema,
+} from '../index';
 
 describe('slugify', () => {
   it('tira acentos e pontuação e usa hífens', () => {
@@ -102,5 +108,40 @@ describe('createTeamSchema', () => {
       ['slug', 'Informe o endereço.'],
       ['project', 'Informe o primeiro projeto.'],
     ]);
+  });
+});
+
+// Os caracteres são escritos como `\u....` de propósito: no código-fonte eles não apareceriam.
+describe('nomes de equipe e de projeto', () => {
+  const team = { name: 'Acme', slug: 'acme', project: { name: 'Atlas', slug: 'atlas' } };
+  const messagesFor = (name: string) =>
+    [
+      createTeamSchema.safeParse({ ...team, name }),
+      createTeamSchema.safeParse({ ...team, project: { name, slug: 'atlas' } }),
+      createProjectSchema.safeParse({ name, slug: 'atlas' }),
+      updateProjectSchema.safeParse({ name }),
+    ].map((result) => result.error?.issues[0]?.message);
+
+  it.each([
+    ['nulo', '\u0000'],
+    ['quebra de linha', '\n'],
+    ['tabulação', '\t'],
+    ['espaço de largura zero', '\u200B'],
+    ['inversão de direção do texto', '\u202E'],
+    ['separador de linha', '\u2028'],
+    ['separador de parágrafo', '\u2029'],
+  ])('nomes recusam caracteres de controle e invisíveis: %s', (_label, character) => {
+    const project = 'O nome do projeto tem caracteres que não são permitidos.';
+
+    expect(messagesFor(`At${character}las`)).toEqual([
+      'O nome da equipe tem caracteres que não são permitidos.',
+      project,
+      project,
+      project,
+    ]);
+  });
+
+  it.each(['Estúdio Órion', 'Ação & Cia. 2', 'Atlas 🚀', 'Vega ❤️'])('aceitam "%s"', (name) => {
+    expect(messagesFor(name)).toEqual([undefined, undefined, undefined, undefined]);
   });
 });
