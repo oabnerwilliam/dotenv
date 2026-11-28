@@ -1,19 +1,19 @@
 # 05 — Projetos e navegação
 
-**Estado:** a fazer · **Depende de:** 03 · **Spec:** §6, §8 · **Design:** `DESIGN.md` (Layout), `App-Board`, `App-Menu-Equipe` · **Tela nova: designer primeiro**
+**Estado:** concluída · **Depende de:** 03 · **Spec:** §6, §8 · **Design:** `DESIGN.md` (Layout), `App-Board`, `App-Menu-Equipe` · **Tela nova: designer primeiro**
 
 Como membro, quero criar projetos e navegar entre eles.
 
 ## Critérios de aceite
-- [ ] Nav superior, menu lateral e seletor de projeto como no design, sem a busca.
-- [ ] O menu lateral recolhe e a escolha persiste ao recarregar.
-- [ ] Menu da equipe com Membros, Configurações, dados do usuário e Sair; Esc e clique fora fecham.
-- [ ] Criar projeto (nome e slug único na equipe).
-- [ ] Renomear e arquivar projeto, com confirmação; arquivado some das listas.
-- [ ] Rotas `/p/:projeto`, `/p/:projeto/historico` e `/p/:projeto/configuracoes`.
-- [ ] Projeto inexistente ou de outra equipe responde "não encontrado".
-- [ ] Teste automatizado de isolamento entre duas equipes.
-- [ ] Funciona em tela estreita conforme `SCREENS.md` (Responsivo).
+- [x] Nav superior, menu lateral e seletor de projeto como no design, sem a busca.
+- [x] O menu lateral recolhe e a escolha persiste ao recarregar.
+- [x] Menu da equipe com Membros, Configurações, dados do usuário e Sair; Esc e clique fora fecham.
+- [x] Criar projeto (nome e slug único na equipe).
+- [x] Renomear e arquivar projeto, com confirmação; arquivado some das listas.
+- [x] Rotas `/p/:projeto`, `/p/:projeto/historico` e `/p/:projeto/configuracoes`.
+- [x] Projeto inexistente ou de outra equipe responde "não encontrado".
+- [x] Teste automatizado de isolamento entre duas equipes.
+- [x] Funciona em tela estreita conforme `SCREENS.md` (Responsivo).
 
 ## Fora de escopo
 Troca de equipe, Conexões, busca ⌘K, conteúdo das páginas.
@@ -66,22 +66,22 @@ Todas: 401 `UNAUTHENTICATED`, 403 `NOT_INVITED`, 429 `RATE_LIMITED`. Nenhum cód
 
 ### T0 — Desenho [designer]
 **Arquivos:** `docs/design/screens/`, `docs/design/index.html`, `docs/design/docs/{SCREENS,COMPONENTS}.md`. Desktop e 375px, só componentes e tokens existentes.
-- [ ] Casca (a partir de `App-Board`): nav **sem busca**; menu lateral expandido, recolhido e em tela estreita (fechado e aberto) **(D3)**; "Novo projeto" nos dois modos; bloco da equipe sem ação **(D7)**; seletor de projeto fechado e aberto; nomes e slugs longos.
-- [ ] Menu da equipe (`App-Menu-Equipe` adaptada): cabeçalho **(D7)**, "Membros" levando a `/equipe/membros` **(D1)**, "Configurações" **(D2)**, também sem projeto, nome e e-mail, Sair; sem Conexões, contagem e troca ou criação de equipe.
-- [ ] `App-Projeto-Novo`: vazio, erro nos campos (com 409), enviando e erro geral.
-- [ ] `App-Projeto-Renomear` (modal) e `App-Projeto-Arquivar` (confirmação: some das listas, não há como desfazer no app, o endereço continua reservado; caso do último projeto); enviando e erro.
-- [ ] Painel "Projeto" em Configurações (nome, endereço em mono só para leitura, "Renomear", "Arquivar"). A 06 acrescenta os outros painéis à mesma página.
-- [ ] Marcadores de board, histórico, configurações e membros (`/equipe/membros`, provisório até a 04) **(D1)**; "nenhum projeto" (com "Criar projeto"); "projeto não encontrado" (com volta); carregando e falha ao listar projetos (com "Tentar de novo").
-- [ ] Retirar `App-Projeto-Provisorio` das rotas em `SCREENS.md`.
-- [ ] Commit `docs(design): navegação e gestão de projetos`.
+- [x] Casca (a partir de `App-Board`): nav **sem busca**; menu lateral expandido, recolhido e em tela estreita (fechado e aberto) **(D3)**; "Novo projeto" nos dois modos; bloco da equipe sem ação **(D7)**; seletor de projeto fechado e aberto; nomes e slugs longos.
+- [x] Menu da equipe (`App-Menu-Equipe` adaptada): cabeçalho **(D7)**, "Membros" levando a `/equipe/membros` **(D1)**, "Configurações" **(D2)**, também sem projeto, nome e e-mail, Sair; sem Conexões, contagem e troca ou criação de equipe.
+- [x] `App-Projeto-Novo`: vazio, erro nos campos (com 409), enviando e erro geral.
+- [x] `App-Projeto-Renomear` (modal) e `App-Projeto-Arquivar` (confirmação: some das listas, não há como desfazer no app, o endereço continua reservado; caso do último projeto); enviando e erro.
+- [x] Painel "Projeto" em Configurações (nome, endereço em mono só para leitura, "Renomear", "Arquivar"). A 06 acrescenta os outros painéis à mesma página.
+- [x] Marcadores de board, histórico, configurações e membros (`/equipe/membros`, provisório até a 04) **(D1)**; "nenhum projeto" (com "Criar projeto"); "projeto não encontrado" (com volta); carregando e falha ao listar projetos (com "Tentar de novo").
+- [x] Retirar `App-Projeto-Provisorio` das rotas em `SCREENS.md`.
+- [x] Commit `docs(design): navegação e gestão de projetos`.
 
 ### T1 — Contratos em `shared` [back]
 **Arquivos:** `src/projects.ts` (novo: schemas e tipos), `src/team.ts` (exporta e endurece `nameSchema`), `src/index.ts`, `src/__tests__/{projects,team}.test.ts`.
-- [ ] `projects.test` `createProjectSchema apara o nome e valida o endereço`: `'  Atlas '` vira `'Atlas'`; nome vazio e de 61 caracteres recusados com o caminho `name`; slug inválido com o caminho `slug`.
-- [ ] `projects.test` `updateProjectSchema ignora o slug`: o resultado só tem `name`.
-- [ ] `projects.test` `projectListSchema descarta campos a mais`.
-- [ ] `team.test` `nomes recusam caracteres de controle e invisíveis`: `\u0000`, `\n`, `\t` no meio, `​` e `‮` recusados em equipe, primeiro projeto e projeto; acentos, espaços e emoji simples aceitos.
-- [ ] Commit `feat(shared): contratos de projetos`.
+- [x] `projects.test` `createProjectSchema apara o nome e valida o endereço`: `'  Atlas '` vira `'Atlas'`; nome vazio e de 61 caracteres recusados com o caminho `name`; slug inválido com o caminho `slug`.
+- [x] `projects.test` `updateProjectSchema ignora o slug`: o resultado só tem `name`.
+- [x] `projects.test` `projectListSchema descarta campos a mais`.
+- [x] `team.test` `nomes recusam caracteres de controle e invisíveis`: `\u0000`, `\n`, `\t` no meio, `​` e `‮` recusados em equipe, primeiro projeto e projeto; acentos, espaços e emoji simples aceitos.
+- [x] Commit `feat(shared): contratos de projetos`.
 
 ### T2 — API de projetos [back]
 **Arquivos:**
@@ -95,20 +95,20 @@ Todas: 401 `UNAUTHENTICATED`, 403 `NOT_INVITED`, 429 `RATE_LIMITED`. Nenhum cód
 
 **Regras:** respostas campo a campo (`id`, `name`, `slug`); ordem por nome com `localeCompare('pt-BR')`, desempate pela criação; a repetição de slug é decidida pelo banco (`P2002` → `CONFLICT`), sem consulta prévia; renomear e arquivar filtram por `id`, `teamId` e `archivedAt: null` na própria gravação.
 
-- [ ] `lista só os projetos ativos da própria equipe, por nome`: sem o arquivado e sem o da outra equipe; cada item tem só `id`, `name`, `slug`.
-- [ ] `membro comum cria um projeto`: 201, gravado na equipe de quem chamou; `teamId` no corpo é ignorado.
-- [ ] `corpo inválido responde 400 com fields`: `name` e `slug`; nome com `\u0000` → 400, não 500.
-- [ ] `slug repetido na equipe responde 409 em fields.slug, também se o projeto estiver arquivado`.
-- [ ] `o mesmo slug pode existir em outra equipe`.
-- [ ] `duas criações simultâneas com o mesmo slug`: um 201 e um 409.
-- [ ] `renomear muda o nome e mantém o endereço`, mesmo com `slug` no corpo.
-- [ ] `arquivar grava archivedAt, tira da lista e não apaga a linha`; arquivar ou renomear de novo → 404.
-- [ ] `arquivar o último projeto é permitido`: `GET /me` passa a devolver `defaultProjectSlug: null`.
-- [ ] `isolamento entre equipes` (`createTwoTeams`): renomear e arquivar o projeto alheio → 404 com a mesma mensagem do inexistente, e a linha da outra equipe fica intacta; listar não o mostra, nos dois sentidos.
-- [ ] `endereço malformado responde 404` (`%00`, maiúsculas, 200 letras).
-- [ ] `sem token responde 401 e quem não é membro, 403`.
-- [ ] `findOwned` coberto pelos casos de `PATCH` e `/archive` (próprio, inexistente, arquivado, alheio).
-- [ ] Commit `feat(api): projetos`.
+- [x] `lista só os projetos ativos da própria equipe, por nome`: sem o arquivado e sem o da outra equipe; cada item tem só `id`, `name`, `slug`.
+- [x] `membro comum cria um projeto`: 201, gravado na equipe de quem chamou; `teamId` no corpo é ignorado.
+- [x] `corpo inválido responde 400 com fields`: `name` e `slug`; nome com `\u0000` → 400, não 500.
+- [x] `slug repetido na equipe responde 409 em fields.slug, também se o projeto estiver arquivado`.
+- [x] `o mesmo slug pode existir em outra equipe`.
+- [x] `duas criações simultâneas com o mesmo slug`: um 201 e um 409.
+- [x] `renomear muda o nome e mantém o endereço`, mesmo com `slug` no corpo.
+- [x] `arquivar grava archivedAt, tira da lista e não apaga a linha`; arquivar ou renomear de novo → 404.
+- [x] `arquivar o último projeto é permitido`: `GET /me` passa a devolver `defaultProjectSlug: null`.
+- [x] `isolamento entre equipes` (`createTwoTeams`): renomear e arquivar o projeto alheio → 404 com a mesma mensagem do inexistente, e a linha da outra equipe fica intacta; listar não o mostra, nos dois sentidos.
+- [x] `endereço malformado responde 404` (`%00`, maiúsculas, 200 letras).
+- [x] `sem token responde 401 e quem não é membro, 403`.
+- [x] `findOwned` coberto pelos casos de `PATCH` e `/archive` (próprio, inexistente, arquivado, alheio).
+- [x] Commit `feat(api): projetos`.
 
 ### T3 — Casca e navegação [front]
 **Arquivos** (em `apps/web/src/`):
@@ -136,25 +136,25 @@ Todas: 401 `UNAUTHENTICATED`, 403 `NOT_INVITED`, 429 `RATE_LIMITED`. Nenhum cód
 
 **Regras:** item atual com `aria-current="page"` (`NavLink`, com `end` no board); recolhido com `aria-label` e `title`; em tela estreita o recolhido não ocupa espaço; slug desconhecido enquanto a lista é atualizada mostra carregando, não "não encontrado"; a volta leva ao projeto padrão, se estiver na lista, senão ao primeiro, senão a `/`; falha com dados em mãos mantém a tela e mostra a faixa; ações que parecem link são `<a>` (extrair as classes do `Button` se preciso).
 
-- [ ] `useSidebar.test` `alternar grava a escolha e ela vale numa nova carga`.
-- [ ] `useSidebar.test` `sem escolha salva, segue a largura da tela`.
-- [ ] `useSidebar.test` `armazenamento que falha ou valor corrompido não derruba o app`.
-- [ ] `sigla.test`: "Acme" → "Ac"; "Studio Aurora" → "SA"; emoji e acento não são partidos.
-- [ ] `ProjectScope.test` `as três rotas mostram o título da seção do projeto`.
-- [ ] `ProjectScope.test` `slug desconhecido mostra "Projeto não encontrado" com volta`, também em `/historico` e `/configuracoes`.
-- [ ] `ProjectScope.test` `carregando tem role="status"; falha mostra "Tentar de novo", que refaz`.
-- [ ] `SideNav.test` `lista os projetos e marca a seção atual com aria-current`; outro projeto leva ao board dele.
-- [ ] `SideNav.test` `recolhido mantém os nomes acessíveis`; o botão da nav alterna `aria-expanded`.
-- [ ] `ProjectSelect.test` `mostra o slug atual e navega ao escolher outro`.
-- [ ] `TeamMenu.test` `mostra equipe, Membros, Configurações, nome, e-mail e Sair`; sem busca, Conexões ou troca de equipe.
-- [ ] `TeamMenu.test` `Esc e clique fora fecham, e o foco volta ao avatar`.
-- [ ] `TeamMenu.test` `Membros leva a /equipe/membros, que mostra o marcador dentro da casca` **(D1)**.
-- [ ] `TeamMenu.test` `Configurações leva às do projeto atual; fora de um projeto, às do padrão; sem projeto, fica indisponível` **(D2)**.
-- [ ] `TeamMenu.test` `Sair encerra a sessão e leva ao login`.
-- [ ] `AppShell.test` `ordem do Tab: botão do menu, logo, seletor, avatar, menu lateral, conteúdo`.
-- [ ] `HomePage.test` `vai ao projeto padrão; padrão fora da lista vai ao primeiro; sem projeto mostra a casca com "nenhum projeto"`.
-- [ ] Ajustar `RequireMember.test` e conferir os demais testes de tela.
-- [ ] Commit `feat(web): navegação principal`.
+- [x] `useSidebar.test` `alternar grava a escolha e ela vale numa nova carga`.
+- [x] `useSidebar.test` `sem escolha salva, segue a largura da tela`.
+- [x] `useSidebar.test` `armazenamento que falha ou valor corrompido não derruba o app`.
+- [x] `sigla.test`: "Acme" → "Ac"; "Studio Aurora" → "SA"; emoji e acento não são partidos.
+- [x] `ProjectScope.test` `as três rotas mostram o título da seção do projeto`.
+- [x] `ProjectScope.test` `slug desconhecido mostra "Projeto não encontrado" com volta`, também em `/historico` e `/configuracoes`.
+- [x] `ProjectScope.test` `carregando tem role="status"; falha mostra "Tentar de novo", que refaz`.
+- [x] `SideNav.test` `lista os projetos e marca a seção atual com aria-current`; outro projeto leva ao board dele.
+- [x] `SideNav.test` `recolhido mantém os nomes acessíveis`; o botão da nav alterna `aria-expanded`.
+- [x] `ProjectSelect.test` `mostra o slug atual e navega ao escolher outro`.
+- [x] `TeamMenu.test` `mostra equipe, Membros, Configurações, nome, e-mail e Sair`; sem busca, Conexões ou troca de equipe.
+- [x] `TeamMenu.test` `Esc e clique fora fecham, e o foco volta ao avatar`.
+- [x] `TeamMenu.test` `Membros leva a /equipe/membros, que mostra o marcador dentro da casca` **(D1)**.
+- [x] `TeamMenu.test` `Configurações leva às do projeto atual; fora de um projeto, às do padrão; sem projeto, fica indisponível` **(D2)**.
+- [x] `TeamMenu.test` `Sair encerra a sessão e leva ao login`.
+- [x] `AppShell.test` `ordem do Tab: botão do menu, logo, seletor, avatar, menu lateral, conteúdo`.
+- [x] `HomePage.test` `vai ao projeto padrão; padrão fora da lista vai ao primeiro; sem projeto mostra a casca com "nenhum projeto"`.
+- [x] Ajustar `RequireMember.test` e conferir os demais testes de tela.
+- [x] Commit `feat(web): navegação principal`.
 
 ### T4 — Gestão de projetos [front]
 **Arquivos** (em `apps/web/src/`):
@@ -167,25 +167,25 @@ Todas: 401 `UNAUTHENTICATED`, 403 `NOT_INVITED`, 429 `RATE_LIMITED`. Nenhum cód
 
 **Regras:** React Hook Form com `zodResolver` dos schemas de `shared`; `applyApiErrors`; envio desativado com linha `role="status"` e `networkMode: 'always'` como em `CreateTeamPage`; no sucesso, gravar a resposta no cache da lista **antes** de navegar e invalidar a lista e o `/me`; ao arquivar, ir ao primeiro projeto restante ou a `/` e pôr o foco no título (o botão que abriu o modal deixa de existir); 404 ao renomear ou arquivar (outra pessoa arquivou) atualiza a lista.
 
-- [ ] `ProjectCreateModal.test` `o endereço acompanha o nome até ser editado`.
-- [ ] `ProjectCreateModal.test` `criar envia nome e slug, fecha e navega ao novo projeto`, que aparece no menu.
-- [ ] `ProjectCreateModal.test` `409 aparece no campo Endereço; falha sem fields vira faixa e mantém o digitado`.
-- [ ] `ProjectCreateModal.test` `Esc fecha, devolve o foco e reabre limpo`.
-- [ ] `ProjectRenameModal.test` `salvar atualiza o nome no menu sem mudar o endereço`; cancelar não envia.
-- [ ] `ProjectArchiveModal.test` `só arquiva depois de confirmar`; cancelar não envia.
-- [ ] `ProjectArchiveModal.test` `vai para outro projeto e o arquivado some do menu e do seletor`.
-- [ ] `ProjectArchiveModal.test` `arquivar o último mostra "nenhum projeto"`, sem voltar ao arquivado.
-- [ ] `ProjectArchiveModal.test` `falha mantém o modal aberto com a faixa`.
-- [ ] Commit `feat(web): criar, renomear e arquivar projetos`.
+- [x] `ProjectCreateModal.test` `o endereço acompanha o nome até ser editado`.
+- [x] `ProjectCreateModal.test` `criar envia nome e slug, fecha e navega ao novo projeto`, que aparece no menu.
+- [x] `ProjectCreateModal.test` `409 aparece no campo Endereço; falha sem fields vira faixa e mantém o digitado`.
+- [x] `ProjectCreateModal.test` `Esc fecha, devolve o foco e reabre limpo`.
+- [x] `ProjectRenameModal.test` `salvar atualiza o nome no menu sem mudar o endereço`; cancelar não envia.
+- [x] `ProjectArchiveModal.test` `só arquiva depois de confirmar`; cancelar não envia.
+- [x] `ProjectArchiveModal.test` `vai para outro projeto e o arquivado some do menu e do seletor`.
+- [x] `ProjectArchiveModal.test` `arquivar o último mostra "nenhum projeto"`, sem voltar ao arquivado.
+- [x] `ProjectArchiveModal.test` `falha mantém o modal aberto com a faixa`.
+- [x] Commit `feat(web): criar, renomear e arquivar projetos`.
 
 ### T5 — Ponta a ponta [front]
 **Arquivos:** `e2e/projects.spec.ts` (novo), `e2e/auth.spec.ts` (ajustar ao que substituiu a página provisória; sair agora é pelo menu da equipe).
-- [ ] `projects.spec` `criar, renomear e arquivar um projeto`, recarregando entre os passos; o endereço do arquivado mostra "não encontrado".
-- [ ] `projects.spec` `o menu lateral recolhido continua assim ao recarregar`.
-- [ ] `projects.spec` `casca, menu da equipe e modais são acessíveis`: axe, alvos ≥ 44px e sem rolagem horizontal, em desktop e 375px, com nomes e slugs longos (reaproveitar `e2e/support/a11y.ts`; incluir os itens de menu na medição).
-- [ ] `auth.spec`: "o dono cria a equipe" espera o título do board; "nomes longos" cobre o projeto real e o endereço inexistente.
-- [ ] Os cinco portões passam.
-- [ ] Commit `test: projetos ponta a ponta`.
+- [x] `projects.spec` `criar, renomear e arquivar um projeto`, recarregando entre os passos; o endereço do arquivado mostra "não encontrado".
+- [x] `projects.spec` `o menu lateral recolhido continua assim ao recarregar`.
+- [x] `projects.spec` `casca, menu da equipe e modais são acessíveis`: axe, alvos ≥ 44px e sem rolagem horizontal, em desktop e 375px, com nomes e slugs longos (reaproveitar `e2e/support/a11y.ts`; incluir os itens de menu na medição).
+- [x] `auth.spec`: "o dono cria a equipe" espera o título do board; "nomes longos" cobre o projeto real e o endereço inexistente.
+- [x] Os cinco portões passam.
+- [x] Commit `test: projetos ponta a ponta`.
 
 ### Cobertura dos critérios
 | Critério | Onde |
