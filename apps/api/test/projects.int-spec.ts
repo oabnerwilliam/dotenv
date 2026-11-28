@@ -279,7 +279,67 @@ describe('projetos', () => {
     expect(meSchema.parse(me.body)).toMatchObject({ state: 'member', defaultProjectSlug: null });
   });
 
+  it('arquivamentos simultâneos: um 200 e os outros 404', async () => {
+    const { a } = teams;
+
+    const responses = await Promise.all(
+      Array.from({ length: 5 }, () => archive(a.member, a.project.slug)),
+    );
+
+    expect(responses.map((response) => response.status).sort()).toEqual([200, 404, 404, 404, 404]);
+  });
+
+  // O corpo pode ser um JSON válido que não é um objeto: continua sendo erro de quem chamou.
+  it.each([
+    ['lista', '[]'],
+    ['lista com objeto', '[{"name":"Atlas","slug":"atlas"}]'],
+    ['nome que é objeto', '{"name":{"set":"Atlas"},"slug":"atlas"}'],
+  ])('corpo com formato errado responde 400 e não grava: %s', async (_label, body) => {
+    const { a } = teams;
+    const before = await rows();
+    const token = await auth.signToken({ claims: { sub: a.member.supabaseId } });
+
+    for (const [method, path] of [
+      ['post', '/projects'],
+      ['patch', `/projects/${a.project.slug}`],
+    ] as const) {
+      const agent = request(app.getHttpServer());
+      const response = await agent[method](path)
+        .set('Authorization', `Bearer ${token}`)
+        .set('Content-Type', 'application/json')
+        .send(body);
+
+      expect(response.status).toBe(400);
+      expect(apiErrorSchema.parse(response.body).code).toBe('VALIDATION');
+    }
+    await expect(rows()).resolves.toEqual(before);
+  });
+
+  // `\ud800` é metade de um par: não é texto válido, mas não pode virar erro 500.
+  it('nome com substituto Unicode solto não vira erro interno', async () => {
+    const response = await create(teams.a.member, { name: 'At\ud800las', slug: 'atlas' });
+
+    expect(response.status).toBeLessThan(500);
+  });
+
   describe('isolamento entre equipes', () => {
+    it('a equipe informada na query string não vale: só a de quem chama', async () => {
+      const { a, b } = teams;
+      const query = `?teamId=${b.team.id}`;
+
+      const listed = await send(a.member, 'get', `/projects${query}`);
+      const renamed = await send(a.member, 'patch', `/projects/${b.project.slug}${query}`, {
+        name: 'Invasão',
+      });
+      await send(a.member, 'post', `/projects${query}`, { name: 'Lyra', slug: 'lyra' });
+
+      expect(listed.body).toEqual([
+        { id: a.project.id, name: a.project.name, slug: a.project.slug },
+      ]);
+      expect(renamed.status).toBe(404);
+      await expect(prisma.project.count({ where: { teamId: b.team.id } })).resolves.toBe(1);
+    });
+
     it.each(['a', 'b'] as const)(
       'a equipe %s não lista, não renomeia nem arquiva o projeto da outra',
       async (own) => {
