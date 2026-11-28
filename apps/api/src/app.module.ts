@@ -12,6 +12,7 @@ import { EnvModule } from './config/env.module';
 import { HealthModule } from './health/health.module';
 import { MeModule } from './me/me.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { ProjectsModule } from './projects/projects.module';
 import { TeamModule } from './team/team.module';
 
 @Module({
@@ -27,6 +28,7 @@ import { TeamModule } from './team/team.module';
     HealthModule,
     MeModule,
     TeamModule,
+    ProjectsModule,
   ],
   providers: [
     // Registrado como provider, o filtro vale para a API inteira, inclusive nos testes.

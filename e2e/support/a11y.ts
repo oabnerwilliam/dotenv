@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, type Locator, type Page } from '@playwright/test';
 
 const TARGETS =
-  'button, a[href], input, textarea, [role="combobox"], [role="radio"], [role="switch"], [role="option"]';
+  'button, a[href], input, textarea, [role="combobox"], [role="radio"], [role="switch"], [role="option"], [role="menuitem"]';
 
 /** As violações sérias ou críticas que o axe encontra na página. */
 export async function seriousViolations(page: Page) {
@@ -44,6 +44,22 @@ export async function expectTargetSizes(region: Locator, where: string) {
   );
   expect(small, where).toEqual([]);
   return targets;
+}
+
+export const VIEWPORTS = [
+  { name: 'desktop', size: { width: 1280, height: 720 } },
+  { name: '375px', size: { width: 375, height: 667 } },
+];
+
+/** Axe, tamanho dos alvos e largura, no desktop e no celular. */
+export async function expectAccessibleScreen(page: Page, screen: string) {
+  for (const { name, size } of VIEWPORTS) {
+    const where = `${screen} (${name})`;
+    await page.setViewportSize(size);
+    expect(await seriousViolations(page), where).toEqual([]);
+    await expectTargetSizes(page.locator('body'), where);
+    await expectNoHorizontalScroll(page, where);
+  }
 }
 
 /** O conteúdo não pode passar da largura da janela. */

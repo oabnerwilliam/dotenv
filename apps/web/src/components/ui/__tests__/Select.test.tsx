@@ -119,6 +119,29 @@ describe('Select', () => {
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
+  it('no seletor compacto, o gatilho tem 44px e o prefixo não entra no nome', () => {
+    render(<Controlled compact prefix="~/motivos/" />);
+
+    expect(trigger()).toHaveClass('h-11');
+    expect(screen.getByText('~/motivos/')).toHaveAttribute('aria-hidden', 'true');
+    expect(trigger()).toHaveTextContent('~/motivos/Deploy quebrado');
+  });
+
+  it('sem escolha, mostra o texto de reserva', () => {
+    render(
+      <Select
+        label="Motivo"
+        value=""
+        placeholder="escolher"
+        onValueChange={() => {}}
+        options={OPTIONS}
+      />,
+    );
+
+    expect(trigger()).toHaveTextContent('escolher');
+    expect(screen.getByText('escolher').parentElement).toHaveClass('text-fg-muted');
+  });
+
   it('o ref foca o gatilho e o onBlur só avisa quando o foco sai do controle', async () => {
     const user = userEvent.setup();
     const ref = createRef<HTMLButtonElement>();

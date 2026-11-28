@@ -1,7 +1,7 @@
 # .env — pacote de design
 
 - `docs/` — especificação (DESIGN.md, COMPONENTS.md, SCREENS.md) e `tokens.css` (Tailwind v4).
-- `screens/` — 32 telas em HTML estático (fonte de verdade da aparência). Abra `index.html` no navegador; os links entre telas funcionam. Não há JS: menu recolhível, dropdown da equipe e destaque por status são interações a implementar (descritas em docs/).
+- `screens/` — 61 telas em HTML estático (fonte de verdade da aparência). Abra `index.html` no navegador; os links entre telas funcionam. Não há JS: menu recolhível, dropdown da equipe e destaque por status são interações a implementar (descritas em docs/).
 - Os estilos estão inline nas telas (valores exatos de tamanho, cor e espaçamento). Para implementar um componente, abra a tela correspondente e converta para classes Tailwind usando os tokens.
 
 ## Como usar no repositório

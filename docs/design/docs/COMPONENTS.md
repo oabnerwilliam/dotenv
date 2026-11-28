@@ -21,7 +21,24 @@ Em envio: `disabled`, rótulo mantido (o nome acessível não muda) e, abaixo, u
 - `Logo`: `.env_` em `font-mono font-bold text-[21px]`; o `_` em `text-accent cursor-blink` e `aria-hidden`.
 - `AuthLayout`: coluna com `min-h-dvh`, `.scanline` e `.accent-line`; `<header class="px-4 py-4 sm:px-6 sm:py-5">` com o `Logo`; `<main>` centralizado, `flex-1 items-center gap-5 px-4 pt-4 pb-12 sm:px-6 sm:pt-8 sm:pb-16`.
 - Cartão (login e criar equipe): `w-full rounded-lg border border-line bg-surface-2 p-5 sm:p-7 gap-5`, `max-w-[460px]` no login e `max-w-[560px]` em criar equipe. `h1` 28/600 e texto 15 `fg-soft`.
-- Painel (sem permissão, projeto provisório e esqueleto de sessão): o do `EmptyState`, com `max-w-content`.
+- Painel (sem permissão e esqueleto de sessão): o do `EmptyState`, com `max-w-content`.
+
+## AppShell, TopNav e PageHeader (`app/layout/`)
+- `AppShell`: coluna `min-h-dvh` com `.accent-line`, `.scanline`, `TopNav` e, abaixo, `flex flex-1 flex-col md:flex-row` com `SideNav` e `<main class="min-w-0 flex-1 px-4 pt-5 pb-12 md:px-6">`; dentro, caixa `w-full max-w-content mx-auto flex flex-col gap-5`.
+- `TopNav`: `<header>` com `flex flex-wrap items-center gap-3 min-h-16 border-b border-line-subtle px-4 py-2.5 md:px-6`. Grupo (gap 6) com o botão do menu (`IconButton` com `PanelLeft` 20, "Alternar menu lateral", `title="Menu lateral"`, `aria-expanded`) e o `Logo` em link `h-11`; seletor; menu da equipe com `ml-auto`. Abaixo de `md`, o seletor tem `basis-[calc(100%-56px)]`.
+- `PageHeader`: caminho `font-mono text-xs text-fg-muted wrap-anywhere` e `h1` `text-[28px] font-semibold tracking-[-0.02em] wrap-anywhere`, gap 6. O `h1` aceita foco programático (`tabIndex={-1}`); o mesmo vale para o `h1` do `EmptyState`.
+- `EmptyState` na casca: `p-5` abaixo de `md`.
+
+## Sigla (equipe e projeto)
+Duas letras (uma palavra: as duas primeiras; várias: iniciais da primeira e da última), maiúsculas só pela classe `uppercase`. Quando a sigla está num botão ou link, ela é `aria-hidden` e o nome completo vai em texto `sr-only` no mesmo elemento (com `aria-label` sobre a sigla o axe acusa nome diferente do texto visível). Siglas repetidas se distinguem pelo `title` e pelo nome acessível.
+
+## ProjectSelect
+O `Select` com rótulo escondido "Projeto", gatilho `h-11` mono 13/600, `min-w-[220px] max-w-[440px]` (todo o espaço da linha abaixo de `md`) e prefixo `~/projetos/` (`font-normal text-fg-muted`, `aria-hidden`). Slug longo corta no gatilho e quebra na lista (`break-all`, itens com altura mínima 44). Sem escolha: "escolher"; desativado: "carregando…", "indisponível" ou "nenhum", em `fg-muted`.
+
+## Modais de projeto e painel
+- Usam `Modal`, `Field`, `Banner` e `Button`. Rodapé: principal `flex-auto`, "Cancelar" ghost e a linha `role="status"` com `w-full text-[13.5px] text-fg-muted empty:-mt-2`. O botão de envio fica fora do `<form>` e aponta para ele com `form="..."`.
+- Caixa de aviso (último projeto): `data-status="bloqueado"`, `flex gap-2.5 rounded-md border border-(--status)/32 bg-(--status)/10 p-3`, `TriangleAlert` na cor e texto `text-[13.5px] text-fg`.
+- Painel "Projeto": `rounded-lg border border-line bg-surface-2 p-5 gap-4 w-full max-w-[1000px]`, `h2` 16/600, `dl` com linhas `min-h-[52px] border-t border-line-subtle`, `grid-cols-[120px_1fr]` (uma coluna abaixo de `md`).
 
 ## EnvName (nome do ambiente)
 Sempre minúsculo e mono, dentro de caixa escura (`bg-bg border rounded`), com prompt:
@@ -89,10 +106,12 @@ Lista ordenada horizontal: caixa 32 com número mono (ou check verde se concluí
 `cmdk` em dialog: grupos **Ambientes**, **Tickets**, **Branches**, **Pessoas**; item com `EnvName inline`/mono + contexto; ↑↓ navega, Enter abre (ambiente → drawer), Esc fecha. Campo na nav (44px, placeholder "Buscar ambiente, ticket ou branch…", `kbd` ⌘K em mono). Estilo igual ao Select aberto.
 
 ## Menu lateral
-Item: altura 44, `rounded-sm`, texto 14/500 `fg-soft`; ativo `text-accent bg-surface-hover` + `aria-current="page"`. Projeto atual com `›` em acento e sub-itens com guia tracejada `line-dashed`. Recolhido: botões 44×44 (equipe `AC`, siglas `AT BO DE FL`, ícones das seções), separadores de 28px. Botão de alternar sempre na nav.
+`<aside aria-label="Menu lateral">`, `bg-surface-3 border-line-subtle`; expandido `w-sidebar p-3 gap-4`, recolhido `w-sidebar-collapsed px-2.5 py-3 gap-3`. Abaixo de `md`: aberto com a largura toda e borda inferior; recolhido não é exibido.
+Item: altura 44, `rounded-sm`, texto 14/500 `fg-soft`, hover `bg-surface-hover`; ativo `text-accent bg-surface-hover` + `aria-current="page"`. Projeto atual (não é link) com `›` em acento e sub-itens com guia tracejada `line-dashed`. Nomes com `truncate` e `title`. Bloco da equipe estático: `h-12 rounded-md border border-line bg-surface`, sigla 32. "Novo projeto": item em `fg-muted` com `Plus`. "Recolher" no fim (`mt-auto h-11`, borda `line`, `ChevronsLeft`, `aria-label="Recolher menu lateral"`).
+Recolhido: alvos 44×44 (siglas, "Novo projeto", ícones das seções com `aria-label` e `title`, `ChevronsRight` "Expandir menu lateral"), equipe como `role="img"` com `aria-label`, separadores de 28px. Sigla do projeto atual: `border-line-strong bg-surface-hover text-fg` + `aria-current="true"`. Botão de alternar sempre na nav.
 
 ## Menu da equipe (TeamMenu)
-Gatilho: botão 44×44 `rounded-md` com iniciais da equipe sobre `accent` (texto `bg`). Painel: `absolute right-0 top-[52px] z-40 w-80 bg-surface border border-line-strong rounded-md shadow-[0_16px_40px_rgb(0_0_0/.55)] p-1.5`. Itens `role="menuitem"` de 44px (ícone `fg-muted` 18 + rótulo 14/500 `fg-soft` + dica à direita 12.5px `fg-muted`); troca de equipe com `role="menuitemradio"` e `Check` em acento na atual; separadores de 1px `line`. Usar Radix `DropdownMenu`.
+Gatilho: botão 44×44 `rounded-md` com iniciais da equipe sobre `accent` (texto `bg`). Painel: `absolute right-0 top-[52px] z-40 w-80 bg-surface border border-line-strong rounded-md shadow-[0_16px_40px_rgb(0_0_0/.55)] p-1.5`. Itens `role="menuitem"` de 44px (ícone `fg-muted` 18 + rótulo 14/500 `fg-soft` + dica à direita 12.5px `fg-muted`), destacado `bg-surface-hover-2` com contorno de foco para dentro; desativado `text-fg-muted cursor-not-allowed` com a dica em texto (sem opacidade); separadores de 1px `line`; largura máxima `calc(100vw - 32px)`; nome e e-mail longos quebram linha. Usar Radix `DropdownMenu`. Fase 1: sem Conexões nem troca de equipe (ver SCREENS.md); a troca, quando vier, usa `role="menuitemradio"` com `Check` em acento na atual.
 
 ## Esqueleto (Skeleton)
 `bg-avatar rounded` com `animate-pulse` (opacidade até .45); desligar com `motion-reduce`. Reproduzir as larguras do conteúdo real (nome 96×28, tag 56×22, campos 40–70%).

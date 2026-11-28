@@ -10,9 +10,11 @@ type ModalProps = {
   title: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
+  /** Leva o foco a um campo na abertura. Sem isto, ele vai para o primeiro controle (o X). */
+  focusOnOpen?: () => void;
 };
 
-export function Modal({ open, onOpenChange, title, children, footer }: ModalProps) {
+export function Modal({ open, onOpenChange, title, children, footer, focusOnOpen }: ModalProps) {
   const returnFocus = useReturnFocus();
 
   return (
@@ -21,6 +23,13 @@ export function Modal({ open, onOpenChange, title, children, footer }: ModalProp
         <Dialog.Overlay data-scrim="" className="fixed inset-0 z-30 bg-scrim/72" />
         <Dialog.Content
           {...returnFocus}
+          onOpenAutoFocus={(event) => {
+            // Primeiro guarda quem abriu, depois move o foco.
+            returnFocus.onOpenAutoFocus();
+            if (!focusOnOpen) return;
+            event.preventDefault();
+            focusOnOpen();
+          }}
           // Sem texto de descrição: avisa o Radix para não procurar um.
           aria-describedby={undefined}
           // A 96px do topo, com 16px de margem; se faltar altura, só o corpo rola.

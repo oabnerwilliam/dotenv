@@ -2,6 +2,7 @@ import { act, screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 import { queryKeys } from '../../lib/queryKeys';
+import { projectsAnswers } from '../../test/projects';
 import {
   ME_URL,
   MEMBER,
@@ -37,7 +38,7 @@ describe('rotas protegidas', () => {
     expect(loading).toHaveAttribute('aria-busy', 'true');
     expect(loading).toHaveTextContent('Carregando sua sessão');
     expect(screen.getByRole('heading', { level: 1, name: '.env' })).toBeInTheDocument();
-    expect(await screen.findByRole('heading', { level: 1, name: 'Acme' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Board' })).toBeInTheDocument();
   });
 
   it('membro em / vai para o projeto padrão', async () => {
@@ -46,7 +47,7 @@ describe('rotas protegidas', () => {
 
     const app = renderApp('/');
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Acme' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Board' })).toBeInTheDocument();
     expect(app.path()).toBe('/p/atlas');
   });
 
@@ -59,15 +60,17 @@ describe('rotas protegidas', () => {
     await waitFor(() => expect(app.path()).toBe('/p/atlas'));
   });
 
-  it('membro sem projeto ativo vê a equipe, sem ficar redirecionando', async () => {
+  it('membro sem projeto ativo fica em /, sem ficar redirecionando', async () => {
     seedSession();
     meAnswers({ ...MEMBER, defaultProjectSlug: null });
+    projectsAnswers([]);
 
     const app = renderApp('/');
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Acme' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Nenhum projeto ainda' }),
+    ).toBeInTheDocument();
     expect(app.path()).toBe('/');
-    expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument();
   });
 
   it.each([
@@ -119,7 +122,7 @@ describe('rotas protegidas', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument();
 
     release();
-    expect(await screen.findByRole('heading', { level: 1, name: 'Acme' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Board' })).toBeInTheDocument();
     expect(app.path()).toBe('/p/atlas');
   });
 
@@ -148,12 +151,12 @@ describe('rotas protegidas', () => {
     seedSession();
     meAnswers(MEMBER);
     const app = renderApp('/p/atlas');
-    await screen.findByRole('heading', { level: 1, name: 'Acme' });
+    await screen.findByRole('heading', { level: 1, name: 'Board' });
 
     meAnswers({ code: 'INTERNAL', message: 'Erro interno.' }, 500);
     await act(() => app.client.refetchQueries({ queryKey: queryKeys.me('user-alex') }));
 
-    expect(screen.getByRole('heading', { level: 1, name: 'Acme' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Board' })).toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
@@ -161,7 +164,7 @@ describe('rotas protegidas', () => {
     seedSession();
     meAnswers(MEMBER);
     const app = renderApp('/p/atlas');
-    await screen.findByRole('heading', { level: 1, name: 'Acme' });
+    await screen.findByRole('heading', { level: 1, name: 'Board' });
 
     logoutAnswers(204);
     meAnswers({ code: 'UNAUTHENTICATED', message: 'Sua sessão expirou. Entre novamente.' }, 401);

@@ -1,12 +1,17 @@
 import { lazy, Suspense } from 'react';
-import { Navigate, type RouteObject } from 'react-router';
+import { Navigate, Outlet, type RouteObject } from 'react-router';
+import { BoardPage } from '../features/board/BoardPage';
+import { HistoryPage } from '../features/history/HistoryPage';
+import { MembersPlaceholderPage } from '../features/members/MembersPlaceholderPage';
+import { ProjectScope } from '../features/projects/ProjectScope';
+import { SettingsPage } from '../features/settings/SettingsPage';
 import { AuthCallbackPage } from '../pages/AuthCallbackPage';
 import { CreateTeamPage } from '../pages/CreateTeamPage';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
 import { NoAccessPage } from '../pages/NoAccessPage';
-import { ProjectPlaceholderPage } from '../pages/ProjectPlaceholderPage';
 import { StatusPage } from '../pages/StatusPage';
+import { AppShell } from './layout/AppShell';
 import { RequireMember, RequireState } from './RequireMember';
 
 // Vitrine de componentes: só em desenvolvimento. Com `import.meta.env.DEV` falso, o build de
@@ -36,7 +41,9 @@ export const routes: RouteObject[] = [
     path: '/',
     element: (
       <RequireMember>
-        <HomePage />
+        <AppShell>
+          <HomePage />
+        </AppShell>
       </RequireMember>
     ),
   },
@@ -58,13 +65,27 @@ export const routes: RouteObject[] = [
       </RequireState>
     ),
   },
+  // As telas de membro dividem a mesma casca, que continua montada ao trocar de página.
   {
-    path: '/p/:projeto',
     element: (
       <RequireMember>
-        <ProjectPlaceholderPage />
+        <AppShell>
+          <Outlet />
+        </AppShell>
       </RequireMember>
     ),
+    children: [
+      {
+        path: '/p/:projeto',
+        element: <ProjectScope />,
+        children: [
+          { index: true, element: <BoardPage /> },
+          { path: 'historico', element: <HistoryPage /> },
+          { path: 'configuracoes', element: <SettingsPage /> },
+        ],
+      },
+      { path: '/equipe/membros', element: <MembersPlaceholderPage /> },
+    ],
   },
   { path: '/status', element: <StatusPage /> },
   ...devRoutes,

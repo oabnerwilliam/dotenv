@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import { delay, http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
+import { projectsAnswers } from '../../test/projects';
 import {
   ME_URL,
   MEMBER,
@@ -89,6 +90,7 @@ describe('CreateTeamPage', () => {
     const { user, path, teamName, project } = await openPage();
     meStopsAnswering();
     const received = teamAnswers({ ...MEMBER, defaultProjectSlug: 'portal-vega' });
+    projectsAnswers([{ id: 'p9', name: 'Portal Vega', slug: 'portal-vega' }]);
 
     await user.type(teamName, '  Acme ');
     await user.type(project, 'Portal Vega{Enter}');
@@ -98,7 +100,8 @@ describe('CreateTeamPage', () => {
     expect(received).toEqual([
       { name: 'Acme', slug: 'acme', project: { name: 'Portal Vega', slug: 'portal-vega' } },
     ]);
-    expect(await screen.findByRole('heading', { level: 1, name: 'Acme' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Board' })).toBeInTheDocument();
+    expect(screen.getByText('~/projetos/portal-vega')).toBeInTheDocument();
   });
 
   it('durante o envio, só "Criar equipe" fica desativado e a situação é anunciada', async () => {

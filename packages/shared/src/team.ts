@@ -30,14 +30,21 @@ export const slugSchema = z
   .max(SLUG_MAX, `O endereço pode ter no máximo ${SLUG_MAX} caracteres.`)
   .regex(SLUG_PATTERN, 'Use letras minúsculas sem acento, números e hífens, sem hífen nas pontas.');
 
-// `subject` completa as frases: "da equipe", "do projeto".
-function nameSchema(subject: string) {
+// Caracteres de controle (`Cc`), de formato (`Cf`: largura zero, inversão de direção) e
+// separadores de linha e de parágrafo (`Zl`, `Zp`). Não aparecem na tela, mas permitiriam nomes
+// que parecem iguais sem ser, e o `\u0000` o Postgres nem grava. Efeito colateral: emojis
+// compostos usam o `U+200D` (de formato) e também são recusados.
+const NAME_PATTERN = /^[^\p{Cc}\p{Cf}\p{Zl}\p{Zp}]*$/u;
+
+// Nome de equipe ou de projeto. `subject` completa as frases: "da equipe", "do projeto".
+export function nameSchema(subject: string) {
   const required = `Informe o nome ${subject}.`;
   return z
     .string({ error: required })
     .trim()
     .min(1, required)
-    .max(NAME_MAX, `O nome ${subject} pode ter no máximo ${NAME_MAX} caracteres.`);
+    .max(NAME_MAX, `O nome ${subject} pode ter no máximo ${NAME_MAX} caracteres.`)
+    .regex(NAME_PATTERN, `O nome ${subject} tem caracteres que não são permitidos.`);
 }
 
 // Corpo de `POST /team`: a equipe e o primeiro projeto.
