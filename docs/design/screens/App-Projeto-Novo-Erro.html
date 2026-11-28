@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App — novo projeto, erro nos campos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0B0D10;font-family:Inter,system-ui,sans-serif;color:#E6EDF3}
+h1,h2,p,dl,dd,ul{margin:0}
+button,input{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.5}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid #BEF264;outline-offset:2px}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.trunc{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.any{overflow-wrap:anywhere;min-width:0}
+.scan{position:fixed;inset:0;pointer-events:none;z-index:50;background:repeating-linear-gradient(0deg,rgba(255,255,255,.022) 0,rgba(255,255,255,.022) 1px,transparent 1px,transparent 3px)}
+.accent-line{height:2px;background:linear-gradient(90deg,transparent,#BEF264,transparent);opacity:.55}
+.cur{color:#BEF264;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.sk{display:block;background:#1B222B;border-radius:4px;animation:sk 1.4s ease-in-out infinite}
+@keyframes sk{50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.cur,.sk{animation:none}}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.top{border-bottom:1px solid #1C222A;padding:10px 24px;min-height:64px;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:6px}
+.logo{display:inline-flex;align-items:center;height:44px;padding:0 4px;border-radius:6px;font-size:21px;font-weight:700}
+.iconbtn{width:44px;height:44px;flex:none;border-radius:8px;border:1px solid #2F3944;background:transparent;color:#B4C0CE;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.iconbtn:hover{background:#1A2028}
+.proj{position:relative;display:flex;min-width:0;max-width:440px}
+.trigger{height:44px;min-width:220px;max-width:100%;display:flex;align-items:center;gap:2px;padding:0 10px 0 12px;border:1px solid #2F3944;border-radius:6px;background:#12161B;color:#E6EDF3;font-size:13px;font-weight:600}
+.trigger .pre{color:#8B98A8;font-weight:400;flex:none}
+.trigger .val{flex:1;text-align:left}
+.trigger .ph{color:#8B98A8;font-weight:400}
+.trigger svg{flex:none;color:#8B98A8;margin-left:6px}
+.trigger[aria-expanded=true]{border-color:#BEF264;box-shadow:0 0 0 3px rgba(190,242,100,.15)}
+.trigger[aria-expanded=true] svg{color:#BEF264;transform:rotate(180deg)}
+.list{position:absolute;left:0;top:50px;z-index:40;width:100%;background:#12161B;border:1px solid #2F3944;border-radius:8px;box-shadow:0 16px 40px rgba(0,0,0,.55);padding:6px;display:flex;flex-direction:column;gap:2px}
+.opt{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 12px;border-radius:6px;font-size:14px;word-break:break-all}
+.opt:hover{background:#1A2028}
+.opt[aria-selected=true]{background:rgba(190,242,100,.1);color:#BEF264;font-weight:600}
+.team{margin-left:auto;position:relative}
+.avatar{width:44px;height:44px;border:0;border-radius:8px;background:#BEF264;color:#0B0D10;font-weight:700;font-size:14px;text-transform:uppercase}
+.menu{position:absolute;right:0;top:52px;z-index:40;width:320px;max-width:calc(100vw - 32px);background:#12161B;border:1px solid #2F3944;border-radius:8px;box-shadow:0 16px 40px rgba(0,0,0,.55);padding:6px}
+.mi{display:flex;align-items:center;gap:10px;min-height:44px;width:100%;padding:0 10px;border:0;border-radius:6px;background:transparent;color:#B4C0CE;font-size:14px;font-weight:500;text-align:left}
+.mi:hover{background:#1A2028}
+.mi svg{color:#8B98A8;flex:none}
+.mi[aria-disabled=true]{color:#8B98A8;cursor:not-allowed;background:transparent}
+.mi .aside{margin-left:auto;font-size:12.5px;font-weight:400;color:#8B98A8}
+.sep{height:1px;background:#232A33;margin:6px 0}
+.body{flex:1;display:flex;align-items:stretch;min-width:0}
+.side{width:244px;flex:none;border-right:1px solid #1C222A;background:#0D1014;padding:12px;display:flex;flex-direction:column;gap:16px}
+.rail{width:68px;flex:none;border-right:1px solid #1C222A;background:#0D1014;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.teamblock{height:48px;display:flex;align-items:center;gap:10px;padding:0 8px;border:1px solid #232A33;border-radius:8px;background:#12161B;font-weight:600;font-size:14px}
+.sig{width:32px;height:32px;flex:none;border-radius:6px;background:#1B222B;border:1px solid #2F3944;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;text-transform:uppercase}
+.nav{display:flex;flex-direction:column;gap:2px}
+.label{padding:0 10px 6px;font-weight:600;font-size:12px;color:#8B98A8}
+.item{display:flex;align-items:center;gap:8px;height:44px;flex:none;min-width:0;width:100%;padding:0 10px;border:0;border-radius:6px;background:transparent;color:#B4C0CE;font-size:14px;font-weight:500;text-align:left}
+.item:hover{background:#161B22}
+.item[aria-current=page]{color:#BEF264;background:#161B22}
+.item svg{flex:none}
+.item.new{color:#8B98A8}
+.item .mark{width:10px;flex:none;color:#BEF264}
+.current{font-weight:600;color:#E6EDF3}
+.current:hover{background:transparent}
+.sub{margin-left:14px;padding-left:8px;border-left:1px dashed #2A323C;display:flex;flex-direction:column;gap:2px}
+.collapse{margin-top:auto;height:44px;flex:none;display:flex;align-items:center;gap:10px;padding:0 10px;border:1px solid #232A33;border-radius:6px;background:transparent;color:#8B98A8;font-weight:500;font-size:13px}
+.sq{width:44px;height:44px;flex:none;border-radius:6px;border:1px solid transparent;background:transparent;color:#B4C0CE;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;text-transform:uppercase;padding:0}
+.sq:hover{background:#161B22}
+.sq.on{border-color:#2F3944;background:#161B22;color:#E6EDF3}
+.sq[aria-current=page]{color:#BEF264;background:#161B22}
+.rule{width:28px;height:1px;background:#232A33;flex:none}
+.rail .collapse{width:44px;padding:0;justify-content:center}
+.main{flex:1;min-width:0;padding:20px 24px 48px}
+.content{width:100%;max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.path{font-size:12px;color:#8B98A8;overflow-wrap:anywhere}
+.head{display:flex;flex-direction:column;gap:6px}
+h1.title{font-size:28px;font-weight:600;letter-spacing:-.02em;overflow-wrap:anywhere}
+.panel{width:100%;min-height:560px;border:1px dashed #2F3944;border-radius:12px;background:#0F1216;display:flex;align-items:center;justify-content:center;padding:32px}
+.panel>div{width:100%;max-width:520px;display:flex;flex-direction:column;align-items:flex-start;gap:16px;min-width:0}
+.cmd{max-width:100%;padding:8px 14px;border-radius:8px;border:1px solid #2F3944;background:#0B0D10;font-weight:500;font-size:15px;color:#8B98A8;overflow-wrap:anywhere}
+.cmd b{color:#BEF264;font-weight:500}
+.ibox{width:56px;height:56px;border-radius:12px;background:#12161B;border:1px solid #2F3944;color:#8B98A8;display:flex;align-items:center;justify-content:center}
+.big{font-size:28px;font-weight:600;letter-spacing:-.02em;max-width:100%;overflow-wrap:anywhere}
+.text{font-size:15px;line-height:1.6;color:#B4C0CE;max-width:100%;overflow-wrap:anywhere}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{height:48px;padding:0 18px;border-radius:6px;border:1px solid #2F3944;background:transparent;color:#B4C0CE;font-weight:600;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.btn:hover:not(:disabled){background:#1A2028}
+.btn.sm{height:44px}
+.btn.acc{border-color:#BEF264;color:#BEF264}
+.btn.acc:hover:not(:disabled){background:rgba(190,242,100,.12)}
+.btn.orange{border-color:#FB923C;color:#FB923C;background:rgba(251,146,60,.08)}
+.btn.orange:hover:not(:disabled){background:#FB923C;color:#0B0D10}
+.grow{flex:1 1 auto}
+.box{background:#0F1216;border:1px solid #232A33;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px;max-width:1000px;width:100%}
+.box h2{font-size:16px;font-weight:600}
+.dl>div{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:center;min-height:52px;border-top:1px solid #1C222A;padding:8px 0}
+.dl dt{font-size:13px;color:#8B98A8}
+.dl dd{font-size:14px;overflow-wrap:anywhere}
+.note{font-size:13.5px;color:#8B98A8}
+.banner{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;padding:16px;border-radius:8px;border:1px solid rgba(251,146,60,.4);background:rgba(251,146,60,.1);width:100%}
+.banner>svg{color:#FB923C;flex:none}
+.banner>div.msg{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.banner strong{font-size:14.5px;font-weight:600;color:#FB923C}
+.banner span{font-size:13.5px;line-height:1.5;color:#B4C0CE}
+.scrim{position:fixed;inset:0;z-index:30;background:rgba(5,6,8,.72)}
+.modal{position:fixed;left:16px;right:16px;top:96px;z-index:31;margin:0 auto;max-width:540px;max-height:calc(100vh - 112px);display:flex;flex-direction:column;background:#12161B;border:1px solid #2F3944;border-radius:12px;box-shadow:0 24px 64px rgba(0,0,0,.6)}
+.mhead{display:flex;align-items:center;gap:10px;padding:16px 16px 16px 20px;border-bottom:1px solid #232A33}
+.mhead h2{font-size:20px;font-weight:600;min-width:0}
+.mhead .iconbtn{margin-left:auto}
+.mbody{padding:20px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;min-height:0}
+.mfoot{display:flex;flex-wrap:wrap;gap:8px;padding:16px 20px;border-top:1px solid #232A33}
+.status{width:100%;font-size:13.5px;color:#8B98A8}
+.status:empty{margin-top:-8px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-weight:600;font-size:13px;color:#B4C0CE}
+.field input{height:48px;width:100%;padding:0 12px;background:#0F1216;border:1px solid #2F3944;border-radius:6px;color:#E6EDF3;font-size:14px}
+.field input[aria-invalid=true]{border-color:#F87171}
+.hint{font-size:12.5px;color:#8B98A8;overflow-wrap:anywhere}
+.err{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#F87171}
+.err svg{flex:none}
+.facts{padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.5;color:#B4C0CE;overflow-wrap:anywhere}
+.warnbox{display:flex;gap:10px;padding:12px 14px;border-radius:8px;border:1px solid rgba(251,146,60,.32);background:rgba(251,146,60,.1);font-size:13.5px;line-height:1.5}
+.warnbox svg{flex:none;color:#FB923C;margin-top:2px}
+@media (max-width:767.98px){
+.top{padding:10px 16px}
+.proj{flex:0 0 calc(100% - 56px);max-width:calc(100% - 56px)}
+.trigger{width:100%;min-width:0}
+.body{flex-direction:column}
+.side{width:100%;border-right:0;border-bottom:1px solid #1C222A}
+.body:not(.open)>.side,.body>.rail{display:none}
+.main{padding:20px 16px 48px}
+.panel{padding:20px}
+.dl>div{grid-template-columns:minmax(0,1fr);gap:4px}
+}
+</style>
+</head>
+<body>
+<div class="app" inert aria-hidden="true">
+<div aria-hidden="true" class="scan"></div>
+<div aria-hidden="true" class="accent-line"></div>
+<header class="top">
+<div class="brand"><button class="iconbtn" aria-label="Alternar menu lateral" aria-expanded="true" title="Menu lateral"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+<a class="logo mono" href="App-Projeto-Board.html" aria-label=".env, início">.env<span class="cur" aria-hidden="true">_</span></a></div>
+<div class="proj"><span class="sr" id="lbl-projeto">Projeto</span><button class="trigger mono" role="combobox" aria-labelledby="lbl-projeto" aria-expanded="false"><span class="pre" aria-hidden="true">~/projetos/</span><span class="val trunc">atlas</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>
+<div class="team"><button class="avatar" aria-haspopup="menu" aria-expanded="false"><span aria-hidden="true">Ac</span><span class="sr">Equipe Acme</span></button></div>
+</header>
+<div class="body">
+<aside class="side" aria-label="Menu lateral">
+<div class="teamblock" title="Acme"><span aria-hidden="true" class="sig">Ac</span><span class="trunc">Acme</span></div>
+<nav aria-label="Projetos" class="nav"><span class="label">Projetos</span><div class="item current" title="Atlas"><span aria-hidden="true" class="mark mono">›</span><span class="trunc">Atlas</span></div><div class="sub"><a class="item" href="App-Projeto-Board.html" aria-current="page"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Board</a><a class="item" href="App-Projeto-Historico.html"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>Histórico</a><a class="item" href="App-Projeto-Config.html"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.2 2h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>Configurações</a></div><a class="item" href="App-Projeto-Board.html" title="Hydra"><span aria-hidden="true" class="mark"></span><span class="trunc">Hydra</span></a><a class="item" href="App-Projeto-Board.html" title="Lyra"><span aria-hidden="true" class="mark"></span><span class="trunc">Lyra</span></a><a class="item" href="App-Projeto-Board.html" title="Vega"><span aria-hidden="true" class="mark"></span><span class="trunc">Vega</span></a>
+<button class="item new"><span aria-hidden="true" style="width:10px;display:flex;justify-content:center"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>Novo projeto</button></nav>
+<button class="collapse" aria-label="Recolher menu lateral"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 17-5-5 5-5"/><path d="m11 17-5-5 5-5"/></svg>Recolher</button>
+</aside>
+<main class="main"><div class="content">
+<div class="head"><span class="path mono">~/projetos/atlas</span><h1 class="title">Board</h1></div><div class="panel"><div><p class="cmd mono"><b aria-hidden="true">$ </b>env status --project=atlas</p><h2 class="big">Board em construção</h2><p class="text">Os ambientes do projeto Atlas vão aparecer aqui.</p></div></div>
+</div></main>
+</div>
+</div>
+<div class="scrim" aria-hidden="true"></div>
+<div role="dialog" aria-modal="true" aria-labelledby="m-title" class="modal">
+<div class="mhead"><h2 id="m-title">Novo projeto</h2><a class="iconbtn" href="App-Projeto-Board.html" aria-label="Fechar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></a></div>
+<div class="mbody"><div class="field"><label for="p-nome">Nome do projeto</label><input id="p-nome" value="" autocomplete="off" aria-describedby="p-nome-e" aria-invalid="true"><p id="p-nome-e" class="err"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Informe o nome do projeto.</p></div><div class="field"><label for="p-slug">Endereço</label><input id="p-slug" class="mono" value="Draco 2" autocomplete="off" aria-describedby="p-slug-h p-slug-e" aria-invalid="true"><p id="p-slug-h" class="hint">Letras minúsculas, números e hífens, de 2 a 40 caracteres. Não dá para mudar depois.</p><p id="p-slug-e" class="err"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Use só letras minúsculas, números e hífens.</p></div></div>
+<div class="mfoot"><button class="btn grow acc"><span class="mono" aria-hidden="true">&gt;</span>Criar projeto</button><a class="btn" href="App-Projeto-Board.html">Cancelar</a>
+<p role="status" class="status"></p></div>
+</div>
+</body>
+</html>

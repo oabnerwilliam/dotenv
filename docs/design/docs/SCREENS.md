@@ -59,7 +59,7 @@ interface Evento { quando: string; ambiente: string; tipo: 'deploy'|'reserva'|'l
 - **Menu da equipe** (`App-Menu-Equipe`): ao clicar no avatar `AC` da nav abre um menu de 320px alinhado à direita (`role="menu"`, `aria-haspopup`, `aria-expanded`): cabeçalho com avatar, nome e `env.app/slug`; Membros (nº de pessoas), Conexões (status GitHub/Jira com ponto verde), Configurações da equipe; "Trocar de equipe" (lista com check na atual) e "Criar nova equipe"; dados do usuário (nome, e-mail) e Sair. Fecha com Esc, clique fora ou ao escolher um item; foco volta ao avatar.
 
 ## Acesso (fase 1)
-Todas as telas desta seção usam `AuthLayout` (logo no topo, sem nav, menu lateral ou seletor de projeto; a casca do app chega depois).
+Todas as telas desta seção usam `AuthLayout` (logo no topo, sem nav, menu lateral ou seletor de projeto). As rotas de projeto e de membros usam a casca: ver "Casca e projetos (fase 1)".
 
 ### Rotas e estados
 | Rota | Situação | Tela |
@@ -74,9 +74,8 @@ Todas as telas desta seção usam `AuthLayout` (logo no topo, sem nav, menu late
 | `/onboarding/equipe` | enviando | `App-Onb-Empresa-Enviando` |
 | `/onboarding/equipe` | erro geral | `App-Onb-Empresa-Falha` |
 | `/sem-permissao` | não é membro nem convidado | `App-Sem-Permissao` |
-| `/p/:projeto` | membro (provisória) | `App-Projeto-Provisorio` |
 
-`/` exige login e leva o membro ao projeto (no futuro pode virar uma página pública de apresentação). A tela de status da API fica em `/status`, pública. Sessão ausente ou expirada leva a `/login`.
+`/` exige login e leva o membro ao projeto padrão (se não estiver na lista, ao primeiro; sem projeto, mostra "Nenhum projeto ainda") (no futuro pode virar uma página pública de apresentação). A tela de status da API fica em `/status`, pública. Sessão ausente ou expirada leva a `/login`.
 
 ### Login
 - Um único botão. Ao clicar, fica desativado, mantém o rótulo e a linha de situação abaixo mostra "Abrindo o Google…". Se a página voltar do cache do navegador (botão Voltar), o botão volta a ficar ativo.
@@ -96,9 +95,6 @@ Painel tracejado com cadeado, `h1` "Você não tem acesso a esta equipe", texto 
 - Carregando: painel em esqueleto com `role="status"`, `aria-busy="true"` e o texto "Carregando sua sessão" para leitor de tela. Sem pulso com `prefers-reduced-motion`.
 - Falha: `Banner` laranja "Não foi possível carregar sua conta" / "Confira sua conexão e tente de novo." com "Tentar de novo" (laranja, 44px, ícone) e "Sair" (ghost, 44px). Durante a nova tentativa só "Tentar de novo" fica desativado. `h1` só para leitor de tela.
 
-### Projeto (provisória)
-`EmptyState` com a linha `$ env status --project=:projeto`, `h1` com o nome da equipe (caixa original), aviso de que o board está em construção (slug do projeto em mono) e "Sair". Será substituída pelo board.
-
 ### Sair
 Encerra a sessão só neste navegador, limpa os dados em cache e leva a `/login`, mesmo se o servidor de login falhar.
 
@@ -106,7 +102,88 @@ Encerra a sessão só neste navegador, limpa os dados em cache e leva a `/login`
 - Anel de foco em acento em botões e campos. Ordem do Tab igual à ordem visual.
 - Em 375px: margens de 16px, cartão com padding 20, ações quebram linha se faltar espaço, sem rolagem horizontal. Botões 48px (44px dentro de faixa).
 
+## Casca e projetos (fase 1)
+
+Vale sobre o que as seções acima descrevem para busca, menu da equipe e menu lateral. Cada artboard é responsivo: abra em 375px para ver a tela estreita.
+
+### Rotas e artboards
+| Rota | Situação | Tela |
+|---|---|---|
+| `/p/:projeto` | board (marcador) | `App-Projeto-Board` |
+| `/p/:projeto/historico` | marcador | `App-Projeto-Historico` |
+| `/p/:projeto/configuracoes` | painel "Projeto" | `App-Projeto-Config` |
+| `/equipe/membros` | provisória, sem projeto atual | `App-Equipe-Membros` |
+| `/` | membro sem projeto ativo | `App-Projetos-Vazio` |
+| `/p/:projeto` e filhas | projeto inexistente, arquivado ou de outra equipe | `App-Projeto-Nao-Encontrado` |
+| rotas da casca | carregando a lista | `App-Projetos-Carregando` |
+| rotas da casca | falha sem dados | `App-Projetos-Erro` |
+| rotas da casca | falha com dados na tela | `App-Projetos-Atualizacao-Falha` |
+| (casca) | menu lateral recolhido; aberto em tela estreita; nomes longos | `App-Casca-Recolhida`, `App-Casca-Menu-Aberto`, `App-Casca-Nomes-Longos` |
+| (casca) | seletor de projeto aberto | `App-Casca-Seletor-Aberto`, `App-Casca-Seletor-Longo` |
+| (casca) | menu da equipe | `App-Menu-Equipe-Fase1`, `App-Menu-Equipe-Sem-Projeto` |
+| (modal) | novo projeto | `App-Projeto-Novo`, `-Erro`, `-Conflito`, `-Enviando`, `-Falha` |
+| (modal) | renomear | `App-Projeto-Renomear`, `-Erro`, `-Enviando`, `-Falha` |
+| (modal) | arquivar | `App-Projeto-Arquivar`, `-Ultimo`, `-Enviando`, `-Falha` |
+
+`App-Menu-Equipe`, `App-Board` e `App-Config` continuam como referência das histórias seguintes. `App-Projeto-Provisorio` saiu das rotas.
+
+### Larguras
+- Um corte só: **estreita abaixo de 768px** (`max-width: 767.98px`; `md` do Tailwind para cima é larga).
+- Larga: menu lateral ao lado do conteúdo, sem quebra de linha (`flex-nowrap`, conteúdo `flex-1 min-w-0`). Conteúdo com `px-6 pt-5 pb-12`.
+- Estreita: `px-4` na nav e no conteúdo. A nav tem duas linhas: botão do menu e logo; depois seletor (largura `calc(100% - 56px)`) e avatar. A ordem visual segue a do Tab. Menu lateral recolhido não é exibido (resta o botão da nav); aberto ocupa a largura toda, acima do conteúdo, com borda inferior, e empurra a página.
+- Uma única escolha salva para as duas larguras. Sem escolha: expandido na larga, fechado na estreita. Navegar não fecha o menu.
+
+### Casca
+- Ordem do Tab: botão do menu, logo, seletor, avatar, menu lateral, conteúdo. Sem busca.
+- Logo é link para `/`, nome acessível ".env, início", altura 44.
+- Foco: anel de acento (`:focus-visible`) em todos os controles.
+- Bloco da equipe é estático (sem chevron, sem foco). Nome longo corta com reticências e tem `title`.
+- Menu lateral: projetos na ordem da API. Atual com `›` e sub-itens Board, Histórico, Configurações (`aria-current="page"` na seção). Os demais levam ao board deles. Nomes longos cortam com reticências e têm `title`.
+- "Novo projeto" fica no fim da lista (expandido: ícone `Plus` e rótulo em `fg-muted`; recolhido: botão 44×44 após as siglas). Abre o modal. Desativado enquanto não há lista (carregando ou falha).
+- Recolhido: equipe (estática), siglas, "Novo projeto", separador, ícones das seções (só com projeto atual) e "Expandir menu lateral". A sigla do projeto atual tem fundo, borda e `aria-current="true"`; `aria-current="page"` fica só na seção.
+- Sem projeto atual (`/equipe/membros`, vazio, não encontrado): lista sem sub-itens e seletor com "escolher".
+- Lista no menu lateral: carregando mostra três barras (texto "Carregando projetos" só para leitor de tela, `aria-busy` na `nav`); falha, "Não foi possível carregar os projetos."; vazia, "Nenhum projeto.".
+- Seletor: prefixo `~/projetos/` e slug; escolher leva ao board. Sem projeto atual, "escolher"; desativado com "carregando…", "indisponível" ou "nenhum".
+
+### Menu da equipe
+Cabeçalho (sigla, nome da equipe, slug em mono), "Membros" (`/equipe/membros`, sem contagem), "Configurações" (do projeto atual; fora de um projeto, do padrão), separador, nome e e-mail, "Sair". Sem projeto, "Configurações" fica desativado com a dica "sem projeto". Sem Conexões, troca ou criação de equipe. Esc, clique fora e escolher um item fecham; o foco volta ao avatar.
+
+### Páginas
+Cabeçalho de página (`PageHeader`): caminho em mono e `h1`.
+
+| Página | Caminho | `h1` | Corpo |
+|---|---|---|---|
+| Board | `~/projetos/:projeto` | Board | `env status --project=:projeto` · "Board em construção" · "Os ambientes do projeto :nome vão aparecer aqui." |
+| Histórico | `~/projetos/:projeto/historico` | Histórico | `env log --project=:projeto` · "Histórico em construção" · "Os eventos do projeto :nome vão aparecer aqui." |
+| Configurações | `~/projetos/:projeto/configuracoes` | Configurações | painel "Projeto" e a nota "Ambientes, serviços e regras chegam em breve." |
+| Membros | `~/equipe/membros` | Membros | ícone `Users` · "Em breve" · "A gestão de membros e convites da equipe chega em breve." |
+
+- **Nenhum projeto:** `env project list`, `h1` "Nenhum projeto ainda", "Crie um projeto para organizar os ambientes de homologação da equipe.", `> Criar projeto`.
+- **Não encontrado:** `env status --project=:slug`, `h1` "Projeto não encontrado", "O endereço pode estar errado, ou o projeto foi arquivado.", link `> Voltar ao início` (destino: projeto padrão, senão o primeiro, senão `/`). O texto não distingue projeto de outra equipe.
+- **Carregando:** esqueleto de cabeçalho e painel, `role="status"`, `aria-busy="true"`, "Carregando projetos" e `h1` "Projeto", ambos só para leitor de tela.
+- **Falha sem dados:** `Banner` laranja "Não foi possível carregar os projetos" / "Confira sua conexão e tente de novo." com "Tentar de novo"; `h1` só para leitor de tela "Falha ao carregar os projetos". Durante a nova tentativa o botão fica desativado.
+- **Falha com dados:** `Banner` laranja no topo do conteúdo, "Não foi possível atualizar os projetos" / "Mostrando os últimos dados carregados. Confira sua conexão e tente de novo.", com "Tentar de novo". A tela continua.
+
+### Criar, renomear e arquivar
+| Modal | Título | Ações | Enviando | Faixa de erro |
+|---|---|---|---|---|
+| Criar | Novo projeto | `> Criar projeto`, Cancelar | "Criando o projeto…" | "Não foi possível criar o projeto" |
+| Renomear | Renomear projeto | `> Salvar`, Cancelar | "Salvando o nome…" | "Não foi possível renomear o projeto" |
+| Arquivar | Arquivar projeto | `Arquivar projeto` (laranja, ícone `Archive`), Cancelar | "Arquivando o projeto…" | "Não foi possível arquivar o projeto" |
+
+- Criar: começa vazio; campos "Nome do projeto" e "Endereço" (mono, dica "Letras minúsculas, números e hífens, de 2 a 40 caracteres. Não dá para mudar depois."). O endereço acompanha o nome até ser editado. Foco inicial no nome. Textos de erro: "Informe o nome do projeto.", "Use só letras minúsculas, números e hífens." (formato), demais mensagens do schema; 409 no campo Endereço, "Este endereço já é usado por um projeto, mesmo que arquivado.", sem faixa. Foco no primeiro campo com erro.
+- Renomear: nome preenchido, foco nele, dica "O endereço :slug não muda." (slug em mono). Salvar é a confirmação.
+- Arquivar: "Arquivar o projeto **:nome**?" e a lista "Ele some das listas de toda a equipe.", "Não dá para desfazer pelo app.", "O endereço :slug continua reservado e não pode ser usado em outro projeto.". No último projeto, caixa laranja com ícone: "Este é o último projeto da equipe. Depois de arquivar, será preciso criar outro.".
+- Enviando: só o botão principal fica desativado, com o mesmo rótulo; a linha `role="status"` fica no rodapé. Fechar não cancela o pedido já enviado.
+- Erro geral: `Banner` laranja no fim do corpo, detalhe com a mensagem da API (sem resposta: "Confira sua conexão e tente de novo."). O modal fica aberto com o digitado. Em 404 (outra pessoa arquivou), a lista é atualizada e a tela passa a "Projeto não encontrado".
+- Sucesso: criar leva ao board do novo; renomear fecha e atualiza menu e painel; arquivar leva ao primeiro projeto restante ou a `/` e põe o foco no `h1`.
+- Fechar (X, Esc, Cancelar, clique fora) devolve o foco ao botão que abriu; reabrir começa limpo.
+
+### Painel "Projeto"
+Em Configurações: `h2` "Projeto", "Nome" e "Endereço" (mono, só leitura) em lista de definição, botões "Renomear" (ghost, 44) e "Arquivar" (laranja, 44, ícone `Archive`).
+
 ## Responsivo
+- Corte entre tela estreita e larga em 768px: ver "Casca e projetos (fase 1)" > Larguras.
 - ≥ 1320px de conteúdo: layout B. Abaixo: o conteúdo ocupa a largura disponível.
 - Em tela estreita: menu lateral recolhido vira só o botão da nav; colunas rolam na horizontal; tabelas rolam em caixa própria; drawer ocupa a largura toda.
 
