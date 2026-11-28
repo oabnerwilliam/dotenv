@@ -1,6 +1,8 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll } from 'vitest';
+import { useSidebarStore } from '../lib/useSidebar';
+import { installMatchMedia, setNarrow } from './matchMedia';
 import { server } from './server';
 
 // Prazo do `findBy*` e do `waitFor`. O padrão de 1 s estoura com a máquina ocupada: o primeiro
@@ -18,12 +20,17 @@ Element.prototype.hasPointerCapture ??= () => false;
 Element.prototype.setPointerCapture ??= () => {};
 Element.prototype.releasePointerCapture ??= () => {};
 
+installMatchMedia();
+
 // Requisição sem resposta declarada é erro: nenhum teste chama a API de verdade.
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 
 afterEach(() => {
   cleanup();
   server.resetHandlers();
+  // O menu lateral guarda a escolha num store do módulo, que vive entre os testes do arquivo.
+  setNarrow(false);
+  useSidebarStore.setState(useSidebarStore.getInitialState(), true);
   // A sessão do Supabase e o destino do login ficam no armazenamento do navegador.
   localStorage.clear();
   sessionStorage.clear();

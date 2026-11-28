@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { Lock } from 'lucide-react';
+import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 import { EmptyState } from '../EmptyState';
 
@@ -34,6 +35,26 @@ describe('EmptyState', () => {
     );
 
     expect(screen.getByRole('heading', { level: 1, name: 'Acme' })).toHaveClass('wrap-anywhere');
+  });
+
+  it('o h1 aceita o foco do programa, sem entrar na ordem do Tab', () => {
+    const heading = createRef<HTMLHeadingElement>();
+    render(
+      <EmptyState headingLevel="h1" headingRef={heading} title="Acme">
+        Texto.
+      </EmptyState>,
+    );
+
+    heading.current?.focus();
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveFocus();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveAttribute('tabindex', '-1');
+  });
+
+  it('nome longo sem espaços no texto também quebra a linha', () => {
+    render(<EmptyState title="Board">Os ambientes aparecem aqui.</EmptyState>);
+
+    expect(screen.getByText('Os ambientes aparecem aqui.')).toHaveClass('wrap-anywhere');
   });
 
   it('com ícone, ele é decorativo e entra no lugar da linha de comando', () => {

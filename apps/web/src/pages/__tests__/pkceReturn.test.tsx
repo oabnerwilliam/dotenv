@@ -29,7 +29,7 @@ it('troca o código pela sessão com o verificador PKCE e segue para o destino',
 
   const app = appModule.renderApp('/auth/callback?code=codigo-do-google');
 
-  expect(await screen.findByRole('heading', { level: 1, name: 'Acme' })).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { level: 1, name: 'Board' })).toBeInTheDocument();
   await waitFor(() => expect(app.path()).toBe('/p/atlas'));
   expect(exchanges).toEqual([
     { auth_code: 'codigo-do-google', code_verifier: 'verificador-deste-navegador' },

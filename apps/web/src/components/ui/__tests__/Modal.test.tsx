@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { Modal } from '../Modal';
 import { Select } from '../Select';
@@ -97,6 +97,36 @@ describe('Modal', () => {
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Reservar ambiente' })).toHaveFocus(),
     );
+  });
+
+  it('com um foco inicial pedido, ele vence o X, e a volta continua valendo', async () => {
+    function WithInitialFocus() {
+      const [open, setOpen] = useState(false);
+      const input = useRef<HTMLInputElement>(null);
+      return (
+        <>
+          <button type="button" onClick={() => setOpen(true)}>
+            Renomear
+          </button>
+          <Modal
+            open={open}
+            onOpenChange={setOpen}
+            title="Renomear projeto"
+            focusOnOpen={() => input.current?.focus()}
+          >
+            <input ref={input} aria-label="Nome" />
+          </Modal>
+        </>
+      );
+    }
+    const user = userEvent.setup();
+    render(<WithInitialFocus />);
+
+    await user.click(screen.getByRole('button', { name: 'Renomear' }));
+    await waitFor(() => expect(screen.getByRole('textbox', { name: 'Nome' })).toHaveFocus());
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Renomear' })).toHaveFocus());
   });
 
   it('Tab e Shift+Tab ficam presos dentro', async () => {

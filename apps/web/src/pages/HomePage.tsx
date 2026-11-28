@@ -1,12 +1,41 @@
+import { useState } from 'react';
 import { Navigate } from 'react-router';
-import { useMe } from '../lib/auth';
-import { ProjectPlaceholderPage } from './ProjectPlaceholderPage';
+import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
+import { ProjectCreateModal } from '../features/projects/ProjectCreateModal';
+import { defaultProject, useProjects } from '../features/projects/useProjects';
+import { useMember } from '../lib/auth';
+import { TERMO_EQUIPE } from '../lib/termos';
+import { useTitleFocus } from '../lib/titleFocus';
 
-/** O `/` de quem é membro: leva ao projeto padrão. */
+/** O `/` de quem é membro: leva a um projeto, ou convida a criar o primeiro. */
 export function HomePage() {
-  const { data: me } = useMe();
-  if (me?.state !== 'member') return null;
-  // Equipe sem projeto ativo: mostra a equipe aqui mesmo, para não redirecionar sem fim.
-  if (!me.defaultProjectSlug) return <ProjectPlaceholderPage />;
-  return <Navigate to={`/p/${me.defaultProjectSlug}`} replace />;
+  const member = useMember();
+  const { data: projects } = useProjects();
+  const [creating, setCreating] = useState(false);
+  const heading = useTitleFocus();
+  if (!member || !projects) return null;
+
+  // A lista manda: o padrão do `/me` pode ser um projeto que acabou de ser arquivado.
+  const target = defaultProject(projects, member.defaultProjectSlug);
+  if (target) return <Navigate to={`/p/${target.slug}`} replace />;
+
+  return (
+    <>
+      <EmptyState
+        headingLevel="h1"
+        headingRef={heading}
+        command="env project list"
+        title="Nenhum projeto ainda"
+        actions={
+          <Button variant="accent" prompt onClick={() => setCreating(true)}>
+            Criar projeto
+          </Button>
+        }
+      >
+        Crie um projeto para organizar os ambientes de homologação da {TERMO_EQUIPE}.
+      </EmptyState>
+      {creating && <ProjectCreateModal onClose={() => setCreating(false)} />}
+    </>
+  );
 }

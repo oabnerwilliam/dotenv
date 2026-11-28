@@ -77,3 +77,9 @@ export function useSignOut() {
     }
   }, [queryClient]);
 }
+
+/** Os dados de quem já é membro (equipe, usuário, projeto padrão). Para as telas da casca. */
+export function useMember() {
+  const { data: me } = useMe();
+  return me?.state === 'member' ? me : undefined;
+}
