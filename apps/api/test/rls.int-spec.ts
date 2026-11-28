@@ -61,7 +61,8 @@ describe('papéis públicos no banco de desenvolvimento', () => {
       `SELECT tablename::text AS "table" FROM pg_tables WHERE schemaname = 'public'`,
     );
     tables = result.rows.map((row) => row.table);
-  });
+    // `supabase status` leva alguns segundos e, com os testes do web em paralelo, passa dos 5 s.
+  }, 30_000);
 
   afterAll(async () => {
     await client?.end();
