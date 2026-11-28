@@ -3,6 +3,7 @@ import { Archive, TriangleAlert } from 'lucide-react';
 import { Banner } from '../../components/ui/Banner';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
+import { TERMO_EQUIPE } from '../../lib/termos';
 import { ProjectModalFooter } from './ProjectModalFooter';
 import { displayError, useArchiveProject } from './useProjectMutations';
 
@@ -48,7 +49,7 @@ export function ProjectArchiveModal({
         Arquivar o projeto <strong className="text-fg">{project.name}</strong>?
       </p>
       <ul className="flex list-disc flex-col gap-1.5 pl-[18px] text-sm leading-normal text-fg-soft wrap-anywhere">
-        <li>Ele some das listas de toda a equipe.</li>
+        <li>Ele some das listas de toda a {TERMO_EQUIPE}.</li>
         <li>Não dá para desfazer pelo app.</li>
         <li>
           O endereço <span className="font-mono text-[0.93em]">{project.slug}</span> continua
@@ -67,7 +68,7 @@ export function ProjectArchiveModal({
             className="mt-0.5 shrink-0 text-(--status)"
           />
           <p className="text-[13.5px] leading-normal text-fg">
-            Este é o último projeto da equipe. Depois de arquivar, será preciso criar outro.
+            Este é o último projeto da {TERMO_EQUIPE}. Depois de arquivar, será preciso criar outro.
           </p>
         </div>
       )}

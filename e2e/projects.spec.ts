@@ -104,7 +104,12 @@ test('o menu lateral recolhido continua assim ao recarregar', async ({ page }) =
   await createTeam(page, 'Acme', 'Atlas');
   await expect(toggle(page)).toHaveAttribute('aria-expanded', 'true');
 
-  await button(page, 'Recolher menu lateral').click();
+  // Pelo teclado, o foco segue para o botão que substitui o usado.
+  await button(page, 'Recolher menu lateral').press('Enter');
+  await expect(button(page, 'Expandir menu lateral')).toBeFocused();
+  await page.keyboard.press('Space');
+  await expect(button(page, 'Recolher menu lateral')).toBeFocused();
+  await page.keyboard.press('Enter');
   await expect(toggle(page)).toHaveAttribute('aria-expanded', 'false');
   await page.reload();
   await expect(button(page, 'Expandir menu lateral')).toBeVisible();
@@ -118,6 +123,11 @@ test('o menu lateral recolhido continua assim ao recarregar', async ({ page }) =
   await page.reload();
   await expect(sidebar(page)).toBeVisible();
   await expect(toggle(page)).toHaveAttribute('aria-expanded', 'true');
+
+  // Recolhido na tela estreita, o menu some: o foco vai ao botão da nav.
+  await button(page, 'Recolher menu lateral').press('Enter');
+  await expect(sidebar(page)).toBeHidden();
+  await expect(toggle(page)).toBeFocused();
 });
 
 test('sem escolha salva, o menu começa fechado na tela estreita', async ({ page }) => {

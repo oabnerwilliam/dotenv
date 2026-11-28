@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { setNarrow } from '../../../test/matchMedia';
 import { ATLAS, HYDRA, projectsAnswers, projectsHeld, VEGA } from '../../../test/projects';
@@ -106,6 +106,52 @@ describe('SideNav', () => {
 
     await app.user.click(toggle());
     expect(toggle()).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it.each([
+    ['Enter', '{Enter}'],
+    ['Espaço', ' '],
+  ])(
+    'pelos botões do próprio menu, com %s, o foco segue para o botão que os substitui',
+    async (_key, key) => {
+      const app = await openAsMember();
+      const own = (name: string) => within(sidebar()).getByRole('button', { name });
+
+      own('Recolher menu lateral').focus();
+      await app.user.keyboard(key);
+      expect(own('Expandir menu lateral')).toHaveFocus();
+
+      await app.user.keyboard(key);
+      expect(own('Recolher menu lateral')).toHaveFocus();
+    },
+  );
+
+  it('em tela estreita, recolher pelo menu o esconde e leva o foco ao botão da nav', async () => {
+    setNarrow(true);
+    const app = await openAsMember();
+    await app.user.click(toggle());
+
+    within(sidebar()).getByRole('button', { name: 'Recolher menu lateral' }).focus();
+    await app.user.keyboard('{Enter}');
+
+    expect(toggle()).toHaveFocus();
+    expect(toggle()).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('não move o foco ao carregar, pelo botão da nav nem quando a largura muda', async () => {
+    const app = await openAsMember();
+    expect(document.body).toHaveFocus();
+
+    act(() => setNarrow(true));
+    expect(toggle()).toHaveAttribute('aria-expanded', 'false');
+    expect(document.body).toHaveFocus();
+    act(() => setNarrow(false));
+    expect(document.body).toHaveFocus();
+
+    await app.user.click(toggle());
+    expect(toggle()).toHaveFocus();
+    await app.user.keyboard('{Enter}');
+    expect(toggle()).toHaveFocus();
   });
 
   it('em tela estreita começa fechado e navegar não o fecha', async () => {

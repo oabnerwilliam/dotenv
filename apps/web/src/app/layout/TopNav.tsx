@@ -1,5 +1,6 @@
 import type { Me, Project } from '@env/shared';
 import { PanelLeft } from 'lucide-react';
+import type { Ref } from 'react';
 import { Link } from 'react-router';
 import { IconButton } from '../../components/ui/IconButton';
 import { useSidebar } from '../../lib/useSidebar';
@@ -12,9 +13,10 @@ type TopNavProps = {
   projects: Project[] | undefined;
   failed: boolean;
   current: Project | undefined;
+  menuButtonRef: Ref<HTMLButtonElement>;
 };
 
-export function TopNav({ member, projects, failed, current }: TopNavProps) {
+export function TopNav({ member, projects, failed, current, menuButtonRef }: TopNavProps) {
   const { collapsed, toggle } = useSidebar();
 
   return (
@@ -22,6 +24,7 @@ export function TopNav({ member, projects, failed, current }: TopNavProps) {
     <header className="flex min-h-16 flex-wrap items-center gap-3 border-b border-line-subtle px-4 py-2.5 md:px-6">
       <div className="flex items-center gap-1.5">
         <IconButton
+          ref={menuButtonRef}
           label="Alternar menu lateral"
           title="Menu lateral"
           aria-expanded={!collapsed}

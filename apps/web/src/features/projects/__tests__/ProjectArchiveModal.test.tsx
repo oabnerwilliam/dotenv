@@ -1,11 +1,20 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import type { Project } from '@env/shared';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ATLAS, HYDRA, PROJECTS_URL, projectsBackend, VEGA } from '../../../test/projects';
 import { ME_URL, MEMBER, meAnswers, renderApp } from '../../../test/renderApp';
 import { server } from '../../../test/server';
 import { seedSession } from '../../../test/session';
+
+// O rótulo da equipe com um valor que o teste pode trocar, para provar que a tela o usa.
+const termo = vi.hoisted(() => ({ atual: 'equipe' }));
+vi.mock('../../../lib/termos', () => ({
+  get TERMO_EQUIPE() {
+    return termo.atual;
+  },
+  TERMO_EQUIPE_TITULO: 'Equipe',
+}));
 
 const ARCHIVE_URL = `${PROJECTS_URL}/atlas/archive`;
 const LAST_WARNING =
@@ -38,6 +47,21 @@ async function openModal(app: App) {
 }
 
 describe('ProjectArchiveModal', () => {
+  afterEach(() => {
+    termo.atual = 'equipe';
+  });
+
+  it('o nome do conceito vem do rótulo único', async () => {
+    termo.atual = 'organização';
+    const app = await openSettings([ATLAS]);
+
+    const { dialog } = await openModal(app);
+
+    expect(dialog).toHaveTextContent('Ele some das listas de toda a organização.');
+    expect(dialog).toHaveTextContent('Este é o último projeto da organização.');
+    expect(dialog).not.toHaveTextContent('equipe');
+  });
+
   it('explica o que acontece e só avisa do último projeto quando é o caso', async () => {
     const app = await openSettings();
 

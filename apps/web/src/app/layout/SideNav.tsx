@@ -7,13 +7,15 @@ import {
   Plus,
   Settings,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState, type Ref, type RefObject } from 'react';
+import { flushSync } from 'react-dom';
 import { Link, NavLink } from 'react-router';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ProjectCreateModal } from '../../features/projects/ProjectCreateModal';
 import { cn } from '../../lib/cn';
 import { sigla } from '../../lib/sigla';
 import { TERMO_EQUIPE_TITULO } from '../../lib/termos';
+import { useIsNarrow } from '../../lib/useIsNarrow';
 import { useSidebar } from '../../lib/useSidebar';
 
 type SideNavProps = {
@@ -40,8 +42,29 @@ const SQUARE_CLASS =
 
 const iconProps = { 'aria-hidden': true, strokeWidth: 1.8, className: 'shrink-0' } as const;
 
-export function SideNav(props: SideNavProps) {
+export function SideNav({
+  menuButtonRef,
+  ...props
+}: SideNavProps & {
+  /** O botão de alternar da nav, que recebe o foco quando o menu some. */
+  menuButtonRef: RefObject<HTMLButtonElement | null>;
+}) {
   const { collapsed, toggle } = useSidebar();
+  const narrow = useIsNarrow();
+  // O botão de recolher ou o de expandir, conforme o que está na tela.
+  const ownButton = useRef<HTMLButtonElement>(null);
+
+  /**
+   * Alternar troca o menu inteiro, e o botão usado deixa de existir: sem isto o foco cairia no
+   * `body`. Só vale para os botões do próprio menu.
+   */
+  function toggleFromMenu() {
+    // Recolhido na tela estreita, o menu não é exibido: resta o botão da nav.
+    const hides = narrow && !collapsed;
+    // `flushSync`: o botão novo precisa estar na tela antes de receber o foco.
+    flushSync(toggle);
+    (hides ? menuButtonRef : ownButton).current?.focus();
+  }
   // O modal fica aqui para sobreviver à troca entre menu aberto e recolhido.
   const [creating, setCreating] = useState(false);
   const create = () => setCreating(true);
@@ -49,9 +72,19 @@ export function SideNav(props: SideNavProps) {
   return (
     <>
       {collapsed ? (
-        <CollapsedSideNav {...props} onCreate={create} onExpand={toggle} />
+        <CollapsedSideNav
+          {...props}
+          onCreate={create}
+          onExpand={toggleFromMenu}
+          toggleRef={ownButton}
+        />
       ) : (
-        <ExpandedSideNav {...props} onCreate={create} onCollapse={toggle} />
+        <ExpandedSideNav
+          {...props}
+          onCreate={create}
+          onCollapse={toggleFromMenu}
+          toggleRef={ownButton}
+        />
       )}
       {creating && <ProjectCreateModal onClose={() => setCreating(false)} />}
     </>
@@ -65,7 +98,12 @@ function ExpandedSideNav({
   current,
   onCreate,
   onCollapse,
-}: SideNavProps & { onCreate: () => void; onCollapse: () => void }) {
+  toggleRef,
+}: SideNavProps & {
+  onCreate: () => void;
+  onCollapse: () => void;
+  toggleRef: Ref<HTMLButtonElement>;
+}) {
   const loading = !projects && !failed;
 
   return (
@@ -141,6 +179,7 @@ function ExpandedSideNav({
       </nav>
 
       <button
+        ref={toggleRef}
         type="button"
         aria-label="Recolher menu lateral"
         onClick={onCollapse}
@@ -191,7 +230,12 @@ function CollapsedSideNav({
   current,
   onCreate,
   onExpand,
-}: SideNavProps & { onCreate: () => void; onExpand: () => void }) {
+  toggleRef,
+}: SideNavProps & {
+  onCreate: () => void;
+  onExpand: () => void;
+  toggleRef: Ref<HTMLButtonElement>;
+}) {
   const loading = !projects && !failed;
   const teamLabel = `${TERMO_EQUIPE_TITULO} ${team.name}`;
   const idle = 'border-transparent text-fg-soft hover:bg-surface-hover';
@@ -283,6 +327,7 @@ function CollapsedSideNav({
         </>
       )}
       <button
+        ref={toggleRef}
         type="button"
         aria-label="Expandir menu lateral"
         title="Expandir"

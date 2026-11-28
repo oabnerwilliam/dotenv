@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import {
   ProjectsError,
   ProjectsLoading,
@@ -17,6 +17,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const member = useMember();
   const projects = useProjects();
   const current = useCurrentProject();
+  // A nav e o menu lateral são irmãos: a referência do botão passa por aqui.
+  const menuButton = useRef<HTMLButtonElement>(null);
   if (!member) return null;
 
   const retry = { retrying: projects.isFetching, onRetry: () => void projects.refetch() };
@@ -30,9 +32,11 @@ export function AppShell({ children }: { children: ReactNode }) {
         projects={projects.data}
         failed={projects.failedToLoad}
         current={current}
+        menuButtonRef={menuButton}
       />
       <div className="flex flex-1 flex-col md:flex-row">
         <SideNav
+          menuButtonRef={menuButton}
           team={member.team}
           projects={projects.data}
           failed={projects.failedToLoad}
