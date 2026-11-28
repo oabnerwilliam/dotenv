@@ -117,7 +117,7 @@ Todas: 401 `UNAUTHENTICATED`, 403 `NOT_INVITED`, 429 `RATE_LIMITED`. Nenhum cód
 - `lib/sigla.ts`: duas letras na caixa original (uma palavra: as duas primeiras; várias: inicial da primeira e da última); maiúsculas só por classe;
 - `lib/queryKeys.ts`: `projects: (userId) => ['projects', userId]`;
 - `features/projects/useProjects.ts`: `useQuery` de `GET /projects`;
-- `features/projects/ProjectScope.tsx`: resolve `:projeto` na lista, trata carregando, erro e não encontrado, e entrega o projeto às filhas; exporta `useProject(): Project`;
+- `features/projects/ProjectScope.tsx`: resolve `:projeto` na lista, trata não encontrado (e o carregando enquanto a lista é atualizada) e entrega o projeto às filhas; exporta `useProject(): Project`. O carregando e a falha da lista ficam no `AppShell`, porque o `SCREENS.md` os pede em todas as rotas da casca (ajuste feito na implementação);
 - `features/projects/ProjectNotFound.tsx`: aviso e volta;
 - `app/layout/AppShell.tsx`: moldura (linha de acento, scanline, nav, menu lateral e `<main>` com `max-w-content`), recebe `children`; não depende de haver projeto atual (a 04 põe `/equipe/membros` nela);
 - `app/layout/TopNav.tsx`: botão do menu, `Logo` como link para `/`, seletor e menu da equipe;
